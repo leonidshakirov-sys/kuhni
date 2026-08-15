@@ -1,0 +1,65 @@
+import type { Metadata } from "next";
+import { Cormorant_Garamond, Manrope } from "next/font/google";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { MobileActionBar } from "@/components/MobileActionBar";
+import { UtmTracker } from "@/components/UtmTracker";
+import { YandexMetrika } from "@/components/YandexMetrika";
+import { JsonLd } from "@/components/JsonLd";
+import { siteConfig } from "@/config/site";
+import { organizationJsonLd } from "@/lib/seo";
+import "./globals.css";
+
+const manrope = Manrope({
+  subsets: ["latin", "cyrillic"],
+  variable: "--font-manrope",
+  display: "swap",
+});
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin", "cyrillic"],
+  weight: ["500", "600", "700"],
+  variable: "--font-cormorant",
+  display: "swap",
+});
+
+export const viewport = {
+  themeColor: "#F6F3EE",
+  width: "device-width",
+  initialScale: 1,
+};
+
+export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.siteUrl),
+  title: {
+    default: siteConfig.fullName,
+    template: `%s — ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  icons: { icon: "/favicon.svg" },
+  openGraph: {
+    type: "website",
+    locale: siteConfig.locale,
+    siteName: siteConfig.name,
+  },
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="ru">
+      <body className={`${manrope.variable} ${cormorant.variable} font-sans antialiased`}>
+        <JsonLd data={organizationJsonLd()} />
+        <YandexMetrika />
+        <UtmTracker />
+        <Header />
+        <main className="pb-24 md:pb-0">{children}</main>
+        <Footer />
+        <MobileActionBar />
+      </body>
+    </html>
+  );
+}
