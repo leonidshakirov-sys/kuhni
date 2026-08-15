@@ -8,7 +8,7 @@ export function Footer() {
     <footer className="border-t border-border bg-graphite text-cream">
       <div className="container-site grid gap-10 py-14 md:grid-cols-12">
         <div className="md:col-span-4">
-          <Link href="/" aria-label={`${siteConfig.name} — на главную`}>
+          <Link href="/" className="inline-block" aria-label={`${siteConfig.name} — на главную`}>
             <Logo inverted />
           </Link>
           <p className="mt-4 max-w-sm text-sm leading-relaxed text-cream/75">

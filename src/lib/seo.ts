@@ -44,6 +44,8 @@ export function organizationJsonLd(): Record<string, unknown> {
     "@type": ["Organization", "LocalBusiness", "FurnitureStore"],
     name: siteConfig.name,
     legalName: siteConfig.legalName,
+    logo: absUrl("/images/brand/logo-on-white.png", siteConfig.siteUrl),
+    image: absUrl("/images/brand/logo-on-white.png", siteConfig.siteUrl),
     description: siteConfig.description,
     url: siteConfig.siteUrl,
     telephone: siteConfig.phoneHref.replace("tel:", ""),

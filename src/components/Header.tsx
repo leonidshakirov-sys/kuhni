@@ -9,8 +9,6 @@ import { Logo } from "@/components/Logo";
 import { TelegramIcon } from "@/components/TelegramButton";
 import { cn } from "@/lib/utils";
 
-const compactNav = navItems.slice(0, 4);
-
 export function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -32,51 +30,19 @@ export function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 border-b transition-colors",
-        scrolled
-          ? "border-border/80 bg-background/90 backdrop-blur-md"
-          : "border-transparent bg-background/80 backdrop-blur-sm",
+        "sticky top-0 z-50 bg-background/90 backdrop-blur-md transition-colors",
+        scrolled ? "border-b border-border/80" : "border-b border-transparent",
       )}
     >
-      <div className="container-site flex h-[4.25rem] items-center gap-3 lg:h-[4.75rem] lg:gap-5">
-        <Link href="/" className="shrink-0" aria-label={`${siteConfig.name} — на главную`}>
+      <div className="container-site flex h-[4.25rem] items-center justify-between gap-3 lg:h-[4.5rem]">
+        <Link href="/" className="min-w-0 shrink" aria-label={`${siteConfig.name} — на главную`}>
           <Logo compact />
         </Link>
 
-        <nav
-          className="hidden min-w-0 flex-1 items-center justify-center gap-5 lg:flex xl:hidden"
-          aria-label="Основное меню"
-        >
-          {compactNav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="whitespace-nowrap text-sm text-muted transition-colors hover:text-foreground"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        <nav
-          className="hidden min-w-0 flex-1 items-center justify-center gap-4 2xl:gap-5 xl:flex"
-          aria-label="Основное меню"
-        >
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="whitespace-nowrap text-sm text-muted transition-colors hover:text-foreground"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <a
             href={siteConfig.phoneHref}
-            className="hidden whitespace-nowrap text-sm font-semibold tabular-nums text-graphite md:inline"
+            className="hidden whitespace-nowrap text-[15px] font-semibold tabular-nums tracking-tight text-graphite md:inline"
             onClick={() => trackEvent("phone_click", { place: "header" })}
           >
             {siteConfig.phoneDisplay}
@@ -127,8 +93,25 @@ export function Header() {
         </div>
       </div>
 
+      <nav
+        className="hidden border-t border-border/70 lg:block"
+        aria-label="Основное меню"
+      >
+        <div className="container-site flex h-11 items-center justify-center gap-6 xl:gap-8">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="whitespace-nowrap text-sm text-muted transition-colors hover:text-foreground"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      </nav>
+
       <div id="mobile-menu" className={cn("lg:hidden", open ? "block" : "hidden")}>
-        <div className="container-site space-y-1 pb-6">
+        <div className="container-site space-y-1 border-t border-border pb-6 pt-2">
           {navItems.map((item) => (
             <Link
               key={item.href}

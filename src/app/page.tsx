@@ -44,7 +44,7 @@ export default function HomePage() {
         title="Корпусная мебель на заказ в Москве и МО"
         subtitle="Кухни, шкафы, гардеробные и другая мебель по индивидуальным размерам"
         image="/images/hero/kitchen.webp"
-        imageAlt="Современный интерьер с корпусной мебелью — демо-пример"
+        imageAlt="Современный интерьер с корпусной мебелью на заказ"
         primaryCta={{ href: "/calculator", label: cta.primary }}
         secondaryCta={{ href: "/portfolio", label: cta.examples }}
       />
