@@ -1,6 +1,7 @@
 export const siteConfig = {
-  name: "Шакиров",
-  fullName: "Шакиров — корпусная мебель на заказ",
+  name: "В размер",
+  fullName: "В размер — кухни и шкафы на заказ",
+  logoSubtitle: "Кухни и шкафы на заказ",
   legalName: "ИП Шакиров Леонид Альбертович",
   inn: "772607203680",
   tagline: "Кухни, шкафы, гардеробные и другая мебель по индивидуальным размерам",
@@ -10,6 +11,7 @@ export const siteConfig = {
   phoneHref: "tel:+79162659262",
   phoneDigits: "79162659262",
   whatsappUrl: "https://wa.me/79162659262",
+  telegramUrl: "https://t.me/+79162659262",
   address: "32-й км МКАД, владение 15",
   region: "Москва и Московская область",
   city: "Москва",

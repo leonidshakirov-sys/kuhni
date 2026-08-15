@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       .filter((file) => file.size <= MAX_FILE_SIZE);
 
     const lines = [
-      "Новая заявка с сайта Шакиров",
+      "Новая заявка с сайта В размер",
       `Тип формы: ${formType}`,
       `Имя: ${name}`,
       `Телефон: ${phone}`,

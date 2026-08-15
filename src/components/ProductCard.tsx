@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ButtonLink } from "@/components/ui/Button";
-import { DemoBadge, MediaImage } from "@/components/ui/MediaImage";
+import { MediaImage } from "@/components/ui/MediaImage";
 import { trackEvent } from "@/lib/analytics";
 import { formatProductPrice } from "@/lib/utils";
 import type { Product } from "@/data/products";
@@ -12,7 +12,6 @@ export function ProductCard({ product, event = "catalog_cta" }: { product: Produ
     <article className="flex h-full flex-col overflow-hidden rounded-[1.25rem] bg-surface shadow-card ring-1 ring-border">
       <Link href={product.href} className="relative aspect-[4/3] overflow-hidden">
         <MediaImage src={product.image} alt={product.imageAlt} />
-        <DemoBadge />
       </Link>
       <div className="flex flex-1 flex-col p-5">
         <h3 className="font-display text-2xl text-graphite">{product.title}</h3>

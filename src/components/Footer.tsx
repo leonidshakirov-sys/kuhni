@@ -1,13 +1,17 @@
 import Link from "next/link";
 import { footerNav, legalLinks, siteConfig } from "@/config/site";
+import { Logo } from "@/components/Logo";
+import { TelegramIcon } from "@/components/TelegramButton";
 
 export function Footer() {
   return (
     <footer className="border-t border-border bg-graphite text-cream">
       <div className="container-site grid gap-10 py-14 md:grid-cols-12">
         <div className="md:col-span-4">
-          <p className="font-display text-3xl text-white">{siteConfig.name}</p>
-          <p className="mt-3 max-w-sm text-sm leading-relaxed text-cream/75">
+          <Link href="/" aria-label={`${siteConfig.name} — на главную`}>
+            <Logo inverted />
+          </Link>
+          <p className="mt-4 max-w-sm text-sm leading-relaxed text-cream/75">
             Корпусная мебель на заказ в Москве и Московской области: кухни, шкафы,
             гардеробные, тумбы и комоды по индивидуальным размерам.
           </p>
@@ -26,13 +30,35 @@ export function Footer() {
         </div>
         <div className="md:col-span-3">
           <p className="text-xs uppercase tracking-[0.16em] text-cream/50">Контакты</p>
-          <p className="mt-4 text-sm text-cream/80">{siteConfig.legalName}</p>
-          <p className="mt-1 text-sm text-cream/80">ИНН {siteConfig.inn}</p>
-          <p className="mt-3 text-sm text-cream/80">{siteConfig.address}</p>
+          <p className="mt-4 text-sm text-cream/80">{siteConfig.address}</p>
           <p className="mt-3">
-            <a href={siteConfig.phoneHref} className="text-lg text-white">
+            <a href={siteConfig.phoneHref} className="whitespace-nowrap text-lg text-white">
               {siteConfig.phoneDisplay}
             </a>
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <a
+              href={siteConfig.telegramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-10 items-center gap-2 rounded-full bg-[#229ED9] px-4 text-sm font-medium text-white"
+            >
+              <TelegramIcon className="h-4 w-4" />
+              Telegram
+            </a>
+            <a
+              href={siteConfig.whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-10 items-center rounded-full bg-[#128C7E] px-4 text-sm font-medium text-white"
+            >
+              WhatsApp
+            </a>
+          </div>
+          <p className="mt-5 text-xs leading-relaxed text-cream/50">
+            {siteConfig.legalName}
+            <br />
+            ИНН {siteConfig.inn}
           </p>
         </div>
       </div>

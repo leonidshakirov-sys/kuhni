@@ -34,11 +34,6 @@ export function PortfolioGrid({ limit }: { limit?: number }) {
           </button>
         ))}
       </div>
-      <p className="mt-4 text-sm text-muted">
-        На сайте показаны демо-примеры решений. Подписи не являются отчётом о выполненных заказах.
-        Файлы в папке <code className="text-xs">/public/images/portfolio</code> можно заменить на
-        фотографии производства.
-      </p>
       <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((item) => (
           <PortfolioCard key={item.id} item={item} />

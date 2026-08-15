@@ -2,6 +2,7 @@ export type AnalyticsEvent =
   | "lead_submit"
   | "phone_click"
   | "whatsapp_click"
+  | "telegram_click"
   | "calculator_complete"
   | "catalog_cta"
   | "portfolio_cta";

@@ -18,7 +18,7 @@ export function ContactSection({ showMap = true }: { showMap?: boolean }) {
             <SectionHeading
               eyebrow="Контакты"
               title="Офис и связь"
-              text="Оставьте заявку, позвоните или напишите в WhatsApp. Для расчёта удобнее сразу приложить размеры или фото."
+              text="Оставьте заявку, позвоните или напишите в Telegram и WhatsApp. Для расчёта удобнее сразу приложить размеры или фото."
             />
             <div className="mt-8 space-y-4 text-sm leading-relaxed">
               <p className="text-lg font-medium text-graphite">{siteConfig.legalName}</p>
@@ -50,6 +50,15 @@ export function ContactSection({ showMap = true }: { showMap?: boolean }) {
                 onClick={() => trackEvent("whatsapp_click", { place: "contacts" })}
               >
                 WhatsApp
+              </ButtonLink>
+              <ButtonLink
+                href={siteConfig.telegramUrl}
+                variant="telegram"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackEvent("telegram_click", { place: "contacts" })}
+              >
+                Telegram
               </ButtonLink>
               <ButtonLink href="/calculator">Рассчитать стоимость</ButtonLink>
             </div>

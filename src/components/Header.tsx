@@ -5,7 +5,11 @@ import { useEffect, useState } from "react";
 import { cta, navItems, siteConfig } from "@/config/site";
 import { trackEvent } from "@/lib/analytics";
 import { ButtonLink } from "@/components/ui/Button";
+import { Logo } from "@/components/Logo";
+import { TelegramIcon } from "@/components/TelegramButton";
 import { cn } from "@/lib/utils";
+
+const compactNav = navItems.slice(0, 4);
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -31,83 +35,99 @@ export function Header() {
         "sticky top-0 z-50 border-b transition-colors",
         scrolled
           ? "border-border/80 bg-background/90 backdrop-blur-md"
-          : "border-transparent bg-background/70 backdrop-blur-sm",
+          : "border-transparent bg-background/80 backdrop-blur-sm",
       )}
     >
-      <div className="container-site flex h-16 items-center justify-between gap-4 md:h-[4.5rem]">
+      <div className="container-site flex h-[4.25rem] items-center gap-3 lg:h-[4.75rem] lg:gap-5">
         <Link href="/" className="shrink-0" aria-label={`${siteConfig.name} — на главную`}>
-          <span className="font-display text-2xl tracking-wide text-graphite">
-            {siteConfig.name}
-          </span>
-          <span className="ml-2 hidden text-[11px] uppercase tracking-[0.16em] text-muted sm:inline">
-            мебель на заказ
-          </span>
+          <Logo compact />
         </Link>
 
-        <nav className="hidden items-center gap-5 lg:flex" aria-label="Основное меню">
-          {navItems.map((item) => (
+        <nav
+          className="hidden min-w-0 flex-1 items-center justify-center gap-5 lg:flex xl:hidden"
+          aria-label="Основное меню"
+        >
+          {compactNav.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm text-muted transition-colors hover:text-foreground"
+              className="whitespace-nowrap text-sm text-muted transition-colors hover:text-foreground"
             >
               {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="hidden items-center gap-4 lg:flex">
+        <nav
+          className="hidden min-w-0 flex-1 items-center justify-center gap-4 2xl:gap-5 xl:flex"
+          aria-label="Основное меню"
+        >
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="whitespace-nowrap text-sm text-muted transition-colors hover:text-foreground"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
           <a
             href={siteConfig.phoneHref}
-            className="text-sm font-medium text-graphite"
+            className="hidden whitespace-nowrap text-sm font-semibold tabular-nums text-graphite md:inline"
             onClick={() => trackEvent("phone_click", { place: "header" })}
           >
             {siteConfig.phoneDisplay}
           </a>
-          <ButtonLink href="/calculator" size="sm">
+          <a
+            href={siteConfig.telegramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#229ED9] text-white transition hover:bg-[#1b8fc7]"
+            aria-label="Написать в Telegram"
+            onClick={() => trackEvent("telegram_click", { place: "header" })}
+          >
+            <TelegramIcon />
+          </a>
+          <ButtonLink href="/calculator" size="sm" className="hidden sm:inline-flex">
             {cta.primary}
           </ButtonLink>
+          <button
+            type="button"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface lg:hidden"
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            aria-label={open ? "Закрыть меню" : "Открыть меню"}
+            onClick={() => setOpen((v) => !v)}
+          >
+            <span className="sr-only">Меню</span>
+            <span className="relative block h-3.5 w-5">
+              <span
+                className={cn(
+                  "absolute left-0 h-px w-5 bg-graphite transition",
+                  open ? "top-1.5 rotate-45" : "top-0",
+                )}
+              />
+              <span
+                className={cn(
+                  "absolute left-0 top-1.5 h-px w-5 bg-graphite transition",
+                  open && "opacity-0",
+                )}
+              />
+              <span
+                className={cn(
+                  "absolute left-0 h-px w-5 bg-graphite transition",
+                  open ? "top-1.5 -rotate-45" : "top-3",
+                )}
+              />
+            </span>
+          </button>
         </div>
-
-        <button
-          type="button"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface lg:hidden"
-          aria-expanded={open}
-          aria-controls="mobile-menu"
-          aria-label={open ? "Закрыть меню" : "Открыть меню"}
-          onClick={() => setOpen((v) => !v)}
-        >
-          <span className="sr-only">Меню</span>
-          <span className="relative block h-3.5 w-5">
-            <span
-              className={cn(
-                "absolute left-0 h-px w-5 bg-graphite transition",
-                open ? "top-1.5 rotate-45" : "top-0",
-              )}
-            />
-            <span
-              className={cn(
-                "absolute left-0 top-1.5 h-px w-5 bg-graphite transition",
-                open && "opacity-0",
-              )}
-            />
-            <span
-              className={cn(
-                "absolute left-0 h-px w-5 bg-graphite transition",
-                open ? "top-1.5 -rotate-45" : "top-3",
-              )}
-            />
-          </span>
-        </button>
       </div>
 
-      <div
-        id="mobile-menu"
-        className={cn(
-          "lg:hidden",
-          open ? "block" : "hidden",
-        )}
-      >
+      <div id="mobile-menu" className={cn("lg:hidden", open ? "block" : "hidden")}>
         <div className="container-site space-y-1 pb-6">
           {navItems.map((item) => (
             <Link
@@ -128,6 +148,18 @@ export function Header() {
             }}
           >
             {siteConfig.phoneDisplay}
+          </a>
+          <a
+            href={siteConfig.telegramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block rounded-2xl px-4 py-3 text-base font-medium"
+            onClick={() => {
+              trackEvent("telegram_click", { place: "mobile_menu" });
+              setOpen(false);
+            }}
+          >
+            Telegram
           </a>
           <div className="px-2 pt-2">
             <ButtonLink href="/calculator" className="w-full" onClick={() => setOpen(false)}>

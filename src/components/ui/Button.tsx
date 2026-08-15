@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, AnchorHTMLAttributes } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-type Variant = "primary" | "secondary" | "ghost" | "dark" | "whatsapp";
+type Variant = "primary" | "secondary" | "ghost" | "dark" | "whatsapp" | "telegram";
 type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
@@ -13,6 +13,7 @@ const variants: Record<Variant, string> = {
   ghost: "bg-transparent text-foreground hover:bg-cream",
   dark: "bg-graphite text-white hover:bg-foreground",
   whatsapp: "bg-[#128C7E] text-white hover:bg-[#0e7368]",
+  telegram: "bg-[#229ED9] text-white hover:bg-[#1b8fc7]",
 };
 
 const sizes: Record<Size, string> = {

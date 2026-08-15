@@ -105,7 +105,7 @@ export default function HomePage() {
             <SectionHeading
               eyebrow="Примеры"
               title="Как может выглядеть корпусная мебель"
-              text="Крупные визуальные карточки. Это демо-примеры, а не отчёт «наши работы»."
+              text="Крупные визуальные карточки кухонь, шкафов и гардеробных."
             />
             <ButtonLink href="/portfolio" variant="secondary">
               Все примеры
