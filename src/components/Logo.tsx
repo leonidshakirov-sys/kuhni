@@ -22,8 +22,9 @@ export function Logo({
       <Image
         src="/images/brand/logo.png"
         alt={siteConfig.fullName}
-        width={1404}
-        height={539}
+        width={400}
+        height={154}
+        sizes="(max-width: 640px) 140px, 200px"
         priority
         className={cn(
           "h-9 w-auto max-w-[min(100%,9.25rem)] sm:h-11 sm:max-w-[13.5rem]",

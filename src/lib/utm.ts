@@ -24,11 +24,15 @@ export function persistUtm(utm: UtmParams) {
   if (typeof window === "undefined") return;
   const hasAny = Object.values(utm).some(Boolean);
   if (!hasAny) return;
-  const existing = getStoredUtm();
-  const merged = { ...existing, ...utm };
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-  const maxAge = 60 * 60 * 24 * 90;
-  document.cookie = `${STORAGE_KEY}=${encodeURIComponent(JSON.stringify(merged))}; path=/; max-age=${maxAge}; samesite=lax`;
+  try {
+    const existing = getStoredUtm();
+    const merged = { ...existing, ...utm };
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+    const maxAge = 60 * 60 * 24 * 90;
+    document.cookie = `${STORAGE_KEY}=${encodeURIComponent(JSON.stringify(merged))}; path=/; max-age=${maxAge}; samesite=lax`;
+  } catch {
+    // Safari private mode and some in-app browsers block storage.
+  }
 }
 
 export function getStoredUtm(): UtmParams {

@@ -21,9 +21,9 @@ export function MessengerButtons({
     "inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-medium text-white transition";
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className={cn(variant === "icon" ? "contents" : "flex flex-col gap-2")}>
       {note ? <p className="text-sm text-muted">{siteConfig.messengersNote}</p> : null}
-      <div className="flex flex-wrap items-center gap-2">
+      <div className={cn("flex items-center gap-2", variant !== "icon" && "flex-wrap")}>
         <a
           href={siteConfig.whatsappUrl}
           target="_blank"

@@ -45,10 +45,14 @@
 }
 
 html {
-  scroll-behavior: smooth;
-  overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+}
+
+@media (min-width: 768px) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 body {
@@ -56,7 +60,13 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
   text-rendering: optimizeLegibility;
-  overflow-x: hidden;
+  width: 100%;
+  overflow-x: clip;
+}
+
+img,
+video,
+iframe {
   max-width: 100%;
 }
 

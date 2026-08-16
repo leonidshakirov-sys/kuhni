@@ -6,7 +6,7 @@ export function MediaImage({
   alt,
   className,
   priority = false,
-  sizes = "(max-width: 768px) 100vw, 50vw",
+  sizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px",
 }: {
   src: string;
   alt: string;
@@ -21,6 +21,7 @@ export function MediaImage({
       fill
       priority={priority}
       sizes={sizes}
+      quality={70}
       className={cn("object-cover", className)}
     />
   );

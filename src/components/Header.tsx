@@ -27,10 +27,19 @@ export function Header() {
     };
   }, [open]);
 
+  useEffect(() => {
+    const onResize = () => {
+      if (window.matchMedia("(min-width: 1024px)").matches) setOpen(false);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
   return (
+    <>
     <header
       className={cn(
-        "sticky top-0 z-50 bg-background/90 backdrop-blur-md transition-colors",
+        "sticky top-0 z-50 bg-background transition-colors md:bg-background/90 md:backdrop-blur-md",
         scrolled ? "border-b border-border/80" : "border-b border-transparent",
       )}
     >
@@ -103,14 +112,13 @@ export function Header() {
         </div>
       </nav>
 
-      <div
-        id="mobile-menu"
-        className={cn(
-          "fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom))] top-[4.25rem] z-50 overflow-y-auto bg-background lg:hidden",
-          open ? "block" : "hidden",
-        )}
-      >
-        <div className="container-site space-y-1 pb-6 pt-2">
+    </header>
+    {open ? (
+    <div
+      id="mobile-menu"
+      className="fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom))] top-[4.25rem] z-[60] overflow-y-auto bg-background"
+    >
+      <div className="container-site space-y-1 pb-6 pt-2">
           {navItems.map((item) => (
             <Link
               key={item.href}
@@ -163,6 +171,7 @@ export function Header() {
           </div>
         </div>
       </div>
-    </header>
+    ) : null}
+    </>
   );
 }
