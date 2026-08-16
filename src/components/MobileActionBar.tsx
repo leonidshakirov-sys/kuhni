@@ -16,8 +16,6 @@ export function MobileActionBar() {
         </a>
         <a
           href={siteConfig.telegramUrl}
-          target="_blank"
-          rel="noopener noreferrer"
           className="flex h-11 items-center justify-center rounded-full bg-[#229ED9] text-[11px] font-medium text-white sm:text-sm"
           onClick={() => trackEvent("telegram_click", { place: "mobile_bar" })}
         >
@@ -25,8 +23,6 @@ export function MobileActionBar() {
         </a>
         <a
           href={siteConfig.whatsappUrl}
-          target="_blank"
-          rel="noopener noreferrer"
           className="flex h-11 items-center justify-center rounded-full bg-[#128C7E] text-[11px] font-medium text-white sm:text-sm"
           onClick={() => trackEvent("whatsapp_click", { place: "mobile_bar" })}
         >

@@ -47,8 +47,6 @@ export function PricesContactCta() {
               href={siteConfig.whatsappUrl}
               variant="whatsapp"
               size="lg"
-              target="_blank"
-              rel="noopener noreferrer"
               onClick={() =>
                 trackEvent("price_whatsapp_click", { furniture: "any", place: "prices_bottom" })
               }

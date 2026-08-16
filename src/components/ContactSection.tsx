@@ -45,8 +45,6 @@ export function ContactSection({ showMap = true }: { showMap?: boolean }) {
               <ButtonLink
                 href={siteConfig.whatsappUrl}
                 variant="whatsapp"
-                target="_blank"
-                rel="noopener noreferrer"
                 onClick={() => trackEvent("whatsapp_click", { place: "contacts" })}
               >
                 WhatsApp
@@ -54,8 +52,6 @@ export function ContactSection({ showMap = true }: { showMap?: boolean }) {
               <ButtonLink
                 href={siteConfig.telegramUrl}
                 variant="telegram"
-                target="_blank"
-                rel="noopener noreferrer"
                 onClick={() => trackEvent("telegram_click", { place: "contacts" })}
               >
                 Telegram

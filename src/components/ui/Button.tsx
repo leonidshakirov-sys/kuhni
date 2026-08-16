@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, AnchorHTMLAttributes } from "react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, isExternalHref } from "@/lib/utils";
 
 type Variant = "primary" | "secondary" | "ghost" | "dark" | "whatsapp" | "telegram";
 type Size = "sm" | "md" | "lg";
@@ -73,7 +73,7 @@ export function ButtonLink({
     sizes[size],
     className,
   );
-  if (href.startsWith("http") || href.startsWith("tel:") || href.startsWith("mailto:")) {
+  if (isExternalHref(href)) {
     return <a href={href} className={classes} {...props} />;
   }
   return <Link href={href} className={classes} {...props} />;

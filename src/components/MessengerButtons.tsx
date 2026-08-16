@@ -26,8 +26,6 @@ export function MessengerButtons({
       <div className={cn("flex items-center gap-2", variant !== "icon" && "flex-wrap")}>
         <a
           href={siteConfig.whatsappUrl}
-          target="_blank"
-          rel="noopener noreferrer"
           className={cn(
             variant === "icon" ? iconClass : labeledClass,
             "bg-[#128C7E] hover:bg-[#0e7368]",
@@ -45,8 +43,6 @@ export function MessengerButtons({
         </a>
         <a
           href={siteConfig.telegramUrl}
-          target="_blank"
-          rel="noopener noreferrer"
           className={cn(
             variant === "icon" ? iconClass : labeledClass,
             "bg-[#229ED9] hover:bg-[#1b8fc7]",
