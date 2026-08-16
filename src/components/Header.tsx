@@ -6,7 +6,7 @@ import { cta, navItems, siteConfig } from "@/config/site";
 import { trackEvent } from "@/lib/analytics";
 import { ButtonLink } from "@/components/ui/Button";
 import { Logo } from "@/components/Logo";
-import { TelegramIcon } from "@/components/TelegramButton";
+import { MessengerButtons } from "@/components/MessengerButtons";
 import { cn } from "@/lib/utils";
 
 export function Header() {
@@ -47,16 +47,7 @@ export function Header() {
           >
             {siteConfig.phoneDisplay}
           </a>
-          <a
-            href={siteConfig.telegramUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#229ED9] text-white transition hover:bg-[#1b8fc7]"
-            aria-label="Написать в Telegram"
-            onClick={() => trackEvent("telegram_click", { place: "header" })}
-          >
-            <TelegramIcon />
-          </a>
+          <MessengerButtons place="header" variant="icon" />
           <ButtonLink href="/calculator" size="sm" className="hidden sm:inline-flex">
             {cta.primary}
           </ButtonLink>
@@ -131,6 +122,19 @@ export function Header() {
             }}
           >
             {siteConfig.phoneDisplay}
+          </a>
+          <p className="px-4 pt-2 text-sm text-muted">{siteConfig.messengersNote}</p>
+          <a
+            href={siteConfig.whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block rounded-2xl px-4 py-3 text-base font-medium"
+            onClick={() => {
+              trackEvent("whatsapp_click", { place: "mobile_menu" });
+              setOpen(false);
+            }}
+          >
+            WhatsApp
           </a>
           <a
             href={siteConfig.telegramUrl}

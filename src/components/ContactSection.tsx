@@ -18,7 +18,7 @@ export function ContactSection({ showMap = true }: { showMap?: boolean }) {
             <SectionHeading
               eyebrow="Контакты"
               title="Офис и связь"
-              text="Оставьте заявку, позвоните или напишите в Telegram и WhatsApp. Для расчёта удобнее сразу приложить размеры или фото."
+              text="Оставьте заявку или напишите в WhatsApp или Telegram. Для расчёта удобнее сразу приложить размеры или фото."
             />
             <div className="mt-8 space-y-4 text-sm leading-relaxed">
               <p className="text-lg font-medium text-graphite">{siteConfig.legalName}</p>

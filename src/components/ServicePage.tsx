@@ -8,6 +8,7 @@ import { FAQ } from "@/components/FAQ";
 import { LeadForm } from "@/components/LeadForm";
 import { ProductCard } from "@/components/ProductCard";
 import { CTASection } from "@/components/CTASection";
+import { MessengerButtons } from "@/components/MessengerButtons";
 import { JsonLd } from "@/components/JsonLd";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { Container, Section, SectionHeading } from "@/components/ui/Layout";
@@ -63,11 +64,14 @@ export function ServicePage({ service }: { service: ServiceContent }) {
                 <p className="font-display text-2xl text-graphite">Как получить расчёт</p>
                 <p className="mt-3 text-sm leading-relaxed text-muted">
                   Укажите размеры, пожелания и телефон. Можно приложить фото помещения, план или
-                  эскиз. Предложение готовится по вашему заданию, без случайных «цен за метр».
+                  эскиз. Или напишите в WhatsApp или Telegram — так быстрее согласовать детали.
                 </p>
                 <Link href="#lead" className="mt-4 inline-block text-sm font-medium text-accent">
                   {service.ctaLabel} →
                 </Link>
+                <div className="mt-4">
+                  <MessengerButtons place="service" />
+                </div>
               </div>
             </div>
           </div>

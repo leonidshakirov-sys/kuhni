@@ -3,11 +3,12 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { FormMode } from "@/types";
-import { legalLinks } from "@/config/site";
+import { legalLinks, siteConfig } from "@/config/site";
 import { trackEvent } from "@/lib/analytics";
 import { getStoredUtm } from "@/lib/utm";
 import { formatPhoneInput, isValidRuPhone } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
+import { MessengerButtons } from "@/components/MessengerButtons";
 import { cn } from "@/lib/utils";
 
 const furnitureOptions = [
@@ -136,7 +137,7 @@ export function LeadForm({
       trackEvent("lead_submit", { form: mode });
     } catch {
       setStatus("error");
-      setMessage("Не получилось отправить заявку. Позвоните или напишите в WhatsApp.");
+      setMessage("Не получилось отправить заявку. Напишите в WhatsApp или Telegram.");
     }
   }
 
@@ -161,8 +162,12 @@ export function LeadForm({
       >
         <p className="font-display text-3xl text-graphite">Заявка отправлена</p>
         <p className="mt-3 text-muted">
-          Мы свяжемся с вами, чтобы уточнить размеры и подготовить предложение.
+          Мы свяжемся с вами, чтобы уточнить размеры и подготовить предложение. Если удобнее —
+          напишите в WhatsApp или Telegram.
         </p>
+        <div className="mt-5 flex justify-center">
+          <MessengerButtons place="form_success" />
+        </div>
       </div>
     );
   }
@@ -176,8 +181,12 @@ export function LeadForm({
     >
       <h2 className="font-display text-3xl text-graphite">{title || headings[mode]}</h2>
       <p className="mt-2 text-sm text-muted">
-        Поля с именем и телефоном обязательны. Фото, план или эскиз можно приложить к заявке.
+        Поля с именем и телефоном обязательны. Фото, план или эскиз можно приложить к заявке.{" "}
+        {siteConfig.messengersNote}
       </p>
+      <div className="mt-4">
+        <MessengerButtons place="lead_form" />
+      </div>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <Field

@@ -5,6 +5,7 @@ import { Quiz } from "@/components/Quiz";
 import { FAQ } from "@/components/FAQ";
 import { JsonLd } from "@/components/JsonLd";
 import { Container, Section, SectionHeading } from "@/components/ui/Layout";
+import { MessengerButtons } from "@/components/MessengerButtons";
 import { quizSteps } from "@/data/quiz";
 
 export const metadata = buildMetadata({
@@ -38,8 +39,11 @@ export default function CalculatorPage() {
             <SectionHeading
               eyebrow="Квиз"
               title={quizSteps.title}
-              text="Шесть шагов: что нужно, размеры, стиль, материалы, бюджет и контакты. Это не мгновенный прайс, а сбор данных для предложения."
+              text="Шесть шагов: что нужно, размеры, стиль, материалы, бюджет и контакты. Это не мгновенный прайс, а сбор данных для предложения. Можно сразу написать в WhatsApp или Telegram."
             />
+            <div className="mt-6">
+              <MessengerButtons place="calculator" note />
+            </div>
             <div className="mt-10">
               <Quiz />
             </div>

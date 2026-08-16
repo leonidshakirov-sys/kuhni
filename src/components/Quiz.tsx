@@ -3,11 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { quizSteps } from "@/data/quiz";
-import { legalLinks } from "@/config/site";
+import { legalLinks, siteConfig } from "@/config/site";
 import { trackEvent } from "@/lib/analytics";
 import { getStoredUtm } from "@/lib/utm";
 import { formatPhoneInput, isValidRuPhone } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
+import { MessengerButtons } from "@/components/MessengerButtons";
 import { cn } from "@/lib/utils";
 
 const totalSteps = 6;
@@ -97,8 +98,12 @@ export function Quiz() {
       <div className="rounded-[1.25rem] bg-surface p-8 text-center ring-1 ring-border">
         <p className="font-display text-3xl">Заявка отправлена</p>
         <p className="mt-3 text-muted">
-          Мы подготовим ориентировочный расчёт по вашим ответам и свяжемся по телефону.
+          Мы подготовим ориентировочный расчёт по вашим ответам и свяжемся по телефону. Если
+          удобнее — напишите в WhatsApp или Telegram.
         </p>
+        <div className="mt-5 flex justify-center">
+          <MessengerButtons place="quiz_success" />
+        </div>
       </div>
     );
   }
@@ -230,7 +235,7 @@ export function Quiz() {
             </label>
             {errors.consent ? <FieldError text={errors.consent} /> : null}
             {status === "error" ? (
-              <FieldError text="Не получилось отправить. Позвоните или напишите в WhatsApp." />
+              <FieldError text="Не получилось отправить. Напишите в WhatsApp или Telegram." />
             ) : null}
           </Step>
           <div className="mt-6 flex gap-3">
@@ -240,6 +245,10 @@ export function Quiz() {
             <Button type="submit" disabled={status === "loading"}>
               {status === "loading" ? "Отправляем…" : quizSteps.submitLabel}
             </Button>
+          </div>
+          <p className="mt-5 text-sm text-muted">{siteConfig.messengersNote}</p>
+          <div className="mt-3">
+            <MessengerButtons place="quiz" />
           </div>
         </form>
       ) : (
