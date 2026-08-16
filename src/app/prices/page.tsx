@@ -1,42 +1,70 @@
+import type { Metadata } from "next";
+import Link from "next/link";
 import { buildMetadata, breadcrumbsJsonLd, faqJsonLd } from "@/lib/seo";
 import { pricesFaq } from "@/data/faq";
-import { products } from "@/data/products";
+import { priceCategoryLinks, products } from "@/data/products";
+import { siteConfig } from "@/config/site";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PriceFactors } from "@/components/PriceFactors";
-import { ProductCard } from "@/components/ProductCard";
+import { PriceTiers } from "@/components/PriceTiers";
+import { PriceCard } from "@/components/PriceCard";
+import { PricesHero } from "@/components/PricesHero";
+import { PricesContactCta } from "@/components/PricesContactCta";
 import { FAQ } from "@/components/FAQ";
 import { LeadForm } from "@/components/LeadForm";
-import { CTASection } from "@/components/CTASection";
 import { JsonLd } from "@/components/JsonLd";
+import { ButtonLink } from "@/components/ui/Button";
 import { Container, Section, SectionHeading } from "@/components/ui/Layout";
-import { formatProductPrice } from "@/lib/utils";
+import { absUrl } from "@/lib/utils";
 
-export const metadata = buildMetadata({
-  title: "Цены на корпусную мебель на заказ в Москве",
-  description:
-    "От чего зависит стоимость кухни, шкафа и гардеробной на заказ. Расчёт по размерам, материалам и наполнению — без случайных цифр.",
-  path: "/prices",
-});
+const title = "Цены на мебель на заказ в Москве и МО";
+const description =
+  "Цены на кухни, шкафы, шкафы-купе, гардеробные, тумбы и комоды на заказ. Стартовая стоимость и расчёт мебели по индивидуальным размерам в Москве и МО.";
 
-const comparisons = [
-  {
-    title: "Кухня прямая vs угловая",
-    left: "Прямая проще в проходе и часто дешевле по углам и столешнице.",
-    right: "Угловая даёт больше столешницы и хранения на двух стенах.",
-  },
-  {
-    title: "Распашной шкаф vs купе",
-    left: "Распашные двери открывают секцию целиком, нужен вынос створки.",
-    right: "Купе экономит место перед фасадом, но в момент открыта часть секций.",
-  },
-  {
-    title: "Шкаф vs гардеробная",
-    left: "Шкаф закрывает нишу или стену и остаётся предметом мебели.",
-    right: "Гардеробная — система по стенам комнаты, если площади хватает на проход.",
-  },
-];
+export const metadata: Metadata = {
+  ...buildMetadata({
+    title,
+    description,
+    path: "/prices",
+    ogImage: "/images/kitchens/straight.webp",
+  }),
+  title: { absolute: `${title} | В РАЗМЕР` },
+};
 
-export default function PricesPage() {
+function offersJsonLd(): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Стартовые цены на мебель на заказ",
+    itemListElement: products.map((product, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: absUrl(product.href, siteConfig.siteUrl),
+      name: product.title,
+      item: {
+        "@type": "Product",
+        name: product.title,
+        description: product.description,
+        image: absUrl(product.image, siteConfig.siteUrl),
+        offers: {
+          "@type": "AggregateOffer",
+          priceCurrency: "RUB",
+          lowPrice: product.priceFrom,
+          availability: "https://schema.org/PreOrder",
+          url: absUrl("/prices", siteConfig.siteUrl),
+        },
+      },
+    })),
+  };
+}
+
+export default async function PricesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ product?: string }>;
+}) {
+  const { product: productId } = await searchParams;
+
   return (
     <>
       <JsonLd
@@ -46,6 +74,7 @@ export default function PricesPage() {
             { name: "Цены", href: "/prices" },
           ]),
           faqJsonLd(pricesFaq),
+          offersJsonLd(),
         ]}
       />
       <Breadcrumbs
@@ -54,72 +83,98 @@ export default function PricesPage() {
           { name: "Цены", href: "/prices" },
         ]}
       />
+      <PricesHero />
+
       <Section>
         <Container>
           <SectionHeading
-            eyebrow="Цены"
-            title="Как формируется стоимость мебели на заказ"
-            text="На сайте нет выдуманных прайсов. В карточках стоит «Цена по расчёту». Когда появятся ориентиры «от … ₽», их достаточно прописать в data/products.ts."
+            eyebrow="Примеры"
+            title="Примеры стоимости мебели"
+            text="Выберите похожий вариант, чтобы понять ориентировочный бюджет. Каждый проект рассчитывается индивидуально."
           />
-          <div className="mt-8 overflow-hidden rounded-[1.25rem] bg-surface ring-1 ring-border">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-cream/70 text-muted">
-                <tr>
-                  <th className="px-5 py-3 font-medium">Изделие</th>
-                  <th className="px-5 py-3 font-medium">Ориентир</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map((product) => (
-                  <tr key={product.id} className="border-t border-border">
-                    <td className="px-5 py-3">{product.title}</td>
-                    <td className="px-5 py-3 text-graphite">{formatProductPrice(product.price)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Container>
-      </Section>
-
-      <PriceFactors />
-
-      <Section>
-        <Container>
-          <SectionHeading title="Сравнение вариантов" />
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            {comparisons.map((item) => (
-              <article key={item.title} className="rounded-[1.25rem] bg-surface p-5 ring-1 ring-border">
-                <h3 className="font-medium text-graphite">{item.title}</h3>
-                <p className="mt-3 text-sm text-muted">{item.left}</p>
-                <p className="mt-2 text-sm text-muted">{item.right}</p>
-              </article>
+          <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {products.map((item) => (
+              <PriceCard key={item.id} product={item} />
             ))}
           </div>
+
+          <aside className="mt-10 rounded-[1.4rem] bg-accent-soft p-6 ring-1 ring-accent/15 md:p-8">
+            <p className="font-display text-2xl leading-snug text-graphite md:text-3xl">
+              Указаны стартовые цены на базовые варианты. Итоговая стоимость зависит от размеров,
+              материалов, фасадов, фурнитуры, наполнения и сложности проекта.
+            </p>
+            <p className="mt-4 text-base leading-relaxed text-graphite md:text-lg">
+              Точную стоимость рассчитаем после получения размеров или фотографии помещения.
+            </p>
+            <div className="mt-6">
+              <ButtonLink href="#lead">Рассчитать мою мебель</ButtonLink>
+            </div>
+          </aside>
         </Container>
       </Section>
 
-      <Section className="bg-surface-2/40">
-        <Container>
-          <SectionHeading title="Примеры комплектаций" />
-          <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {products.slice(0, 3).map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </Container>
-      </Section>
+      <PriceFactors text="Размеры, материалы, фасады и наполнение складываются в итоговую стоимость. Ниже — что учитываем в каждом расчёте." />
+      <PriceTiers />
 
-      <Section>
+      <Section className="scroll-mt-36 bg-surface-2/50 md:scroll-mt-40" id="lead">
         <Container>
           <div className="mx-auto max-w-3xl">
-            <LeadForm mode="quick" title="Получить расчёт по размерам" />
+            <LeadForm
+              mode="prices"
+              productId={productId}
+              submitLabel="Получить расчёт"
+              intro="Пришлите размеры, фотографию помещения или эскиз. Сделаем предварительный расчёт и предложим подходящие варианты."
+            />
           </div>
         </Container>
       </Section>
 
-      <FAQ items={pricesFaq} />
-      <CTASection title="Узнайте стоимость по вашим размерам" />
+      <section className="section bg-wood/25">
+        <Container>
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="font-display text-3xl leading-tight text-graphite md:text-5xl">
+              Не знаете точных размеров или комплектации?
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-graphite md:text-lg">
+              Это нормально. Отправьте фотографию помещения и пример того, что вам нравится. Поможем
+              определить подходящую конфигурацию и подготовим предварительный расчёт.
+            </p>
+            <div className="mt-8">
+              <ButtonLink href="#lead" size="lg">
+                Отправить фото
+              </ButtonLink>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      <FAQ
+        items={pricesFaq}
+        title="Вопросы о ценах"
+        text="Коротко о том, как читать стартовые цены и что нужно для точного расчёта."
+      />
+
+      <Section>
+        <Container>
+          <SectionHeading
+            title="Другие разделы"
+            text="Посмотрите примеры по типу мебели или сразу откройте калькулятор расчёта."
+          />
+          <div className="mt-8 flex flex-wrap gap-3">
+            {priceCategoryLinks.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="rounded-full bg-surface px-4 py-2 text-sm font-medium text-graphite ring-1 ring-border transition hover:border-accent/40 hover:bg-accent-soft"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
+      <PricesContactCta />
     </>
   );
 }
