@@ -23,7 +23,14 @@ const sizes: Record<Size, string> = {
 };
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-colors duration-200 disabled:opacity-60 disabled:pointer-events-none";
+  "items-center justify-center gap-2 rounded-full font-medium transition-colors duration-200 disabled:opacity-60 disabled:pointer-events-none";
+
+function hasDisplayClass(className?: string) {
+  return Boolean(
+    className &&
+      /\b(hidden|flex|inline-flex|inline-block|block|grid|contents)\b/.test(className),
+  );
+}
 
 export function Button({
   className,
@@ -36,7 +43,13 @@ export function Button({
 }) {
   return (
     <button
-      className={cn(base, variants[variant], sizes[size], className)}
+      className={cn(
+        !hasDisplayClass(className) && "inline-flex",
+        base,
+        variants[variant],
+        sizes[size],
+        className,
+      )}
       {...props}
     />
   );
@@ -53,7 +66,13 @@ export function ButtonLink({
   variant?: Variant;
   size?: Size;
 }) {
-  const classes = cn(base, variants[variant], sizes[size], className);
+  const classes = cn(
+    !hasDisplayClass(className) && "inline-flex",
+    base,
+    variants[variant],
+    sizes[size],
+    className,
+  );
   if (href.startsWith("http") || href.startsWith("tel:") || href.startsWith("mailto:")) {
     return <a href={href} className={classes} {...props} />;
   }
