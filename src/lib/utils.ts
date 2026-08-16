@@ -10,7 +10,7 @@ export function formatProductPrice(price: ProductPrice): string {
 }
 
 export function absUrl(path: string, origin?: string) {
-  const base = (origin || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(
+  const base = (origin || process.env.NEXT_PUBLIC_SITE_URL || "https://www.vrazmerdom.ru").replace(
     /\/$/,
     "",
   );

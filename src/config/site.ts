@@ -18,7 +18,7 @@ export const siteConfig = {
   city: "Москва",
   locale: "ru_RU",
   get siteUrl() {
-    return (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(
+    return (process.env.NEXT_PUBLIC_SITE_URL || "https://www.vrazmerdom.ru").replace(
       /\/$/,
       "",
     );
