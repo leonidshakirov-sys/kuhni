@@ -26,8 +26,8 @@ export function Logo({
         height={539}
         priority
         className={cn(
-          "h-10 w-auto max-w-[min(100%,11.5rem)] sm:h-11 sm:max-w-[13.5rem]",
-          compact && "h-9 max-w-[10.5rem] sm:h-10 sm:max-w-[12.5rem]",
+          "h-9 w-auto max-w-[min(100%,9.25rem)] sm:h-11 sm:max-w-[13.5rem]",
+          compact && "h-8 max-w-[8.75rem] sm:h-10 sm:max-w-[12.5rem]",
           inverted && "h-12 max-w-[15rem] sm:h-14 sm:max-w-[17rem]",
         )}
       />
