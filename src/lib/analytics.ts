@@ -19,11 +19,15 @@ declare global {
   }
 }
 
+export const YANDEX_METRIKA_ID = 111656931;
+
 export function getMetrikaId() {
   const raw = process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID;
-  if (!raw) return null;
-  const id = Number(raw);
-  return Number.isFinite(id) && id > 0 ? id : null;
+  if (raw) {
+    const id = Number(raw);
+    if (Number.isFinite(id) && id > 0) return id;
+  }
+  return YANDEX_METRIKA_ID;
 }
 
 export function trackEvent(
