@@ -16,7 +16,7 @@ export function MessengerButtons({
   note?: boolean;
 }) {
   const iconClass =
-    "inline-flex h-10 w-10 items-center justify-center rounded-full text-white transition";
+    "inline-flex h-9 w-9 items-center justify-center rounded-full text-white transition sm:h-10 sm:w-10";
   const labeledClass =
     "inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-medium text-white transition";
 

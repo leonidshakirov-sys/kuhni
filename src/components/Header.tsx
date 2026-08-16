@@ -34,12 +34,12 @@ export function Header() {
         scrolled ? "border-b border-border/80" : "border-b border-transparent",
       )}
     >
-      <div className="container-site flex h-[4.25rem] items-center justify-between gap-3 lg:h-[4.5rem]">
+      <div className="container-site flex h-[4.25rem] min-w-0 items-center justify-between gap-2 lg:h-[4.5rem] lg:gap-3">
         <Link href="/" className="min-w-0 shrink" aria-label={`${siteConfig.name} — на главную`}>
           <Logo compact />
         </Link>
 
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 lg:gap-3">
           <a
             href={siteConfig.phoneHref}
             className="hidden whitespace-nowrap text-[15px] font-semibold tabular-nums tracking-tight text-graphite md:inline"
@@ -48,12 +48,14 @@ export function Header() {
             {siteConfig.phoneDisplay}
           </a>
           <MessengerButtons place="header" variant="icon" />
-          <ButtonLink href="/calculator" size="sm" className="hidden sm:inline-flex">
-            {cta.primary}
-          </ButtonLink>
+          <span className="hidden lg:inline-flex">
+            <ButtonLink href="/calculator" size="sm">
+              {cta.primary}
+            </ButtonLink>
+          </span>
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-surface lg:hidden"
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-surface lg:hidden"
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label={open ? "Закрыть меню" : "Открыть меню"}
@@ -101,8 +103,14 @@ export function Header() {
         </div>
       </nav>
 
-      <div id="mobile-menu" className={cn("lg:hidden", open ? "block" : "hidden")}>
-        <div className="container-site space-y-1 border-t border-border pb-6 pt-2">
+      <div
+        id="mobile-menu"
+        className={cn(
+          "fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom))] top-[4.25rem] z-50 overflow-y-auto bg-background lg:hidden",
+          open ? "block" : "hidden",
+        )}
+      >
+        <div className="container-site space-y-1 pb-6 pt-2">
           {navItems.map((item) => (
             <Link
               key={item.href}
