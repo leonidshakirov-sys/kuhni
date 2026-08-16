@@ -54,8 +54,8 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body className={`${manrope.variable} ${cormorant.variable} font-sans antialiased`}>
-        <JsonLd data={organizationJsonLd()} />
         <YandexMetrika />
+        <JsonLd data={organizationJsonLd()} />
         <UtmTracker />
         <Header />
         <main className="pb-24 md:pb-0">{children}</main>
