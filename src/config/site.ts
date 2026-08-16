@@ -12,6 +12,7 @@ export const siteConfig = {
   phoneDigits: "79162659262",
   whatsappUrl: "https://wa.me/79162659262",
   telegramUrl: "https://t.me/+79162659262",
+  messengersNote: "Свяжитесь с нами в WhatsApp или Telegram.",
   address: "32-й км МКАД, владение 15",
   region: "Москва и Московская область",
   city: "Москва",

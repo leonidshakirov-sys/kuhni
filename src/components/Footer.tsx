@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { footerNav, legalLinks, siteConfig } from "@/config/site";
 import { Logo } from "@/components/Logo";
-import { TelegramIcon } from "@/components/TelegramButton";
+import { MessengerButtons } from "@/components/MessengerButtons";
 
 export function Footer() {
   return (
@@ -36,24 +36,9 @@ export function Footer() {
               {siteConfig.phoneDisplay}
             </a>
           </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <a
-              href={siteConfig.telegramUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-10 items-center gap-2 rounded-full bg-[#229ED9] px-4 text-sm font-medium text-white"
-            >
-              <TelegramIcon className="h-4 w-4" />
-              Telegram
-            </a>
-            <a
-              href={siteConfig.whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-10 items-center rounded-full bg-[#128C7E] px-4 text-sm font-medium text-white"
-            >
-              WhatsApp
-            </a>
+          <p className="mt-3 text-sm text-cream/75">{siteConfig.messengersNote}</p>
+          <div className="mt-4">
+            <MessengerButtons place="footer" />
           </div>
           <p className="mt-5 text-xs leading-relaxed text-cream/50">
             {siteConfig.legalName}

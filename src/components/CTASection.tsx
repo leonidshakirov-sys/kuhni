@@ -1,10 +1,12 @@
 import { ButtonLink } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Layout";
+import { MessengerButtons } from "@/components/MessengerButtons";
+import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 
 export function CTASection({
   title = "Узнайте стоимость мебели по вашим размерам",
-  text = "Отправьте тип изделия, размеры, фото или эскиз — подготовим предложение. Можно позвонить или написать в WhatsApp.",
+  text = `Отправьте тип изделия, размеры, фото или эскиз — подготовим предложение. ${siteConfig.messengersNote}`,
   primary = { href: "/calculator", label: "Рассчитать стоимость" },
   secondary,
   dark = true,
@@ -32,6 +34,9 @@ export function CTASection({
                 {secondary.label}
               </ButtonLink>
             ) : null}
+          </div>
+          <div className="mt-5 flex justify-center">
+            <MessengerButtons place="cta" />
           </div>
         </div>
       </Container>
