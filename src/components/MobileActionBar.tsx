@@ -5,7 +5,7 @@ import { trackEvent } from "@/lib/analytics";
 
 export function MobileActionBar() {
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] md:hidden">
       <div className="grid grid-cols-4 gap-1.5 px-2 py-2">
         <a
           href={siteConfig.phoneHref}

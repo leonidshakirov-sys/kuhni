@@ -6,6 +6,7 @@ import { MobileActionBar } from "@/components/MobileActionBar";
 import { UtmTracker } from "@/components/UtmTracker";
 import { YandexMetrika } from "@/components/YandexMetrika";
 import { JsonLd } from "@/components/JsonLd";
+import { ClientErrorBoundary } from "@/components/ClientErrorBoundary";
 import { siteConfig } from "@/config/site";
 import { organizationJsonLd } from "@/lib/seo";
 import "./globals.css";
@@ -55,12 +56,18 @@ export default function RootLayout({
     <html lang="ru">
       <body className={`${manrope.variable} ${cormorant.variable} font-sans antialiased`}>
         <JsonLd data={organizationJsonLd()} />
-        <YandexMetrika />
-        <UtmTracker />
-        <Header />
+        <ClientErrorBoundary>
+          <YandexMetrika />
+          <UtmTracker />
+        </ClientErrorBoundary>
+        <ClientErrorBoundary>
+          <Header />
+        </ClientErrorBoundary>
         <main className="pb-24 md:pb-0">{children}</main>
         <Footer />
-        <MobileActionBar />
+        <ClientErrorBoundary>
+          <MobileActionBar />
+        </ClientErrorBoundary>
       </body>
     </html>
   );
