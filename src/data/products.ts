@@ -17,7 +17,23 @@ export interface Product {
   ctaLabel: string;
 }
 
-type ProductDraft = Omit<Product, "price" | "priceLabel">;
+type ProductDraft = Omit<Product, "price" | "priceLabel" | "ctaLabel"> & {
+  ctaLabel?: string;
+};
+
+export function ctaLabelForCategory(category: FurnitureCategory): string {
+  switch (category) {
+    case "kitchen":
+      return "Рассчитать такую кухню";
+    case "wardrobe":
+    case "sliding":
+      return "Рассчитать шкаф";
+    case "closet":
+      return "Рассчитать гардеробную";
+    default:
+      return "Рассчитать стоимость";
+  }
+}
 
 function withPrice(product: ProductDraft): Product {
   const price: ProductPrice = { type: "from", amount: product.priceFrom };
@@ -25,11 +41,12 @@ function withPrice(product: ProductDraft): Product {
     ...product,
     price,
     priceLabel: formatProductPrice(price),
+    ctaLabel: product.ctaLabel ?? ctaLabelForCategory(product.category),
   };
 }
 
 /**
- * Стартовые цены живут только здесь. Карточки, каталог и страница /prices
+ * Стартовые цены живут только здесь. Карточки, каталог, услуги и /prices
  * берут сумму из `priceFrom` / `priceLabel`.
  */
 export const products: Product[] = [
@@ -50,7 +67,6 @@ export const products: Product[] = [
     ],
     kit: ["Корпус", "Фасады", "Столешница", "Цоколь", "Базовое наполнение"],
     priceFrom: 89900,
-    ctaLabel: "Рассчитать такую кухню",
   }),
   withPrice({
     id: "kitchen-corner",
@@ -70,7 +86,6 @@ export const products: Product[] = [
     ],
     kit: ["Корпус", "Фасады", "Столешница", "Угловой модуль", "Наполнение"],
     priceFrom: 129900,
-    ctaLabel: "Рассчитать угловую кухню",
   }),
   withPrice({
     id: "sliding-200",
@@ -90,7 +105,6 @@ export const products: Product[] = [
     ],
     kit: ["Корпус или ниша", "Система купе", "Полки", "Штанга"],
     priceFrom: 69900,
-    ctaLabel: "Рассчитать шкаф-купе",
   }),
   withPrice({
     id: "wardrobe-builtin",
@@ -109,7 +123,6 @@ export const products: Product[] = [
     ],
     kit: ["Каркас", "Фасады", "Полки", "Штанги", "Ящики по заданию"],
     priceFrom: 59900,
-    ctaLabel: "Рассчитать встроенный шкаф",
   }),
   withPrice({
     id: "walk-in",
@@ -129,7 +142,6 @@ export const products: Product[] = [
     ],
     kit: ["Стойки и корпуса", "Полки", "Штанги", "Ящики", "Обувницы"],
     priceFrom: 99900,
-    ctaLabel: "Рассчитать гардеробную",
   }),
   withPrice({
     id: "cabinet",
@@ -143,7 +155,6 @@ export const products: Product[] = [
     specs: ["Индивидуальные размеры", "Ящики и открытые ниши", "Под размеры стены или ниши"],
     kit: ["Корпус", "Фасады", "Ящики", "Опоры или подвес"],
     priceFrom: 19900,
-    ctaLabel: "Рассчитать тумбу",
   }),
   withPrice({
     id: "dresser",
@@ -156,11 +167,20 @@ export const products: Product[] = [
     specs: ["Нестандартная ширина и высота", "Нужное количество ящиков", "Секции под ваши вещи"],
     kit: ["Корпус", "Фасады ящиков", "Направляющие", "Ручки"],
     priceFrom: 24900,
-    ctaLabel: "Рассчитать комод",
   }),
 ];
 
 export const catalogProducts = products;
+
+const hrefToCategory: Record<string, FurnitureCategory> = {
+  "/kitchens": "kitchen",
+  "/wardrobes": "wardrobe",
+  "/sliding-wardrobes": "sliding",
+  "/walk-in-closets": "closet",
+  "/cabinets": "cabinet",
+  "/dressers": "dresser",
+  "/custom-furniture": "custom",
+};
 
 export const priceCategoryLinks = [
   { href: "/kitchens", label: "Кухни на заказ" },
@@ -172,8 +192,27 @@ export const priceCategoryLinks = [
   { href: "/calculator", label: "Калькулятор расчёта" },
 ] as const;
 
+export function productById(id?: string | null) {
+  if (!id) return undefined;
+  return products.find((item) => item.id === id);
+}
+
+export function productsForCategory(category: FurnitureCategory): Product[] {
+  if (category === "custom") return products;
+  return products.filter((item) => item.category === category);
+}
+
+export function startingProduct(category: FurnitureCategory): Product | undefined {
+  return [...productsForCategory(category)].sort((a, b) => a.priceFrom - b.priceFrom)[0];
+}
+
+export function startingProductByHref(href: string): Product | undefined {
+  const category = hrefToCategory[href];
+  return category ? startingProduct(category) : undefined;
+}
+
 export function furnitureTypeByProductId(id?: string | null) {
-  const product = products.find((item) => item.id === id);
+  const product = productById(id);
   if (!product) return "";
   switch (product.category) {
     case "kitchen":

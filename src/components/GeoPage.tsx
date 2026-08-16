@@ -1,10 +1,13 @@
 import { breadcrumbsJsonLd, faqJsonLd } from "@/lib/seo";
+import { products } from "@/data/products";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { FAQ } from "@/components/FAQ";
 import { CTASection } from "@/components/CTASection";
 import { LeadForm } from "@/components/LeadForm";
+import { ProductCard } from "@/components/ProductCard";
+import { StartingPriceNote } from "@/components/StartingPriceNote";
 import { JsonLd } from "@/components/JsonLd";
-import { Container, Section } from "@/components/ui/Layout";
+import { Container, Section, SectionHeading } from "@/components/ui/Layout";
 import type { LocationPage } from "@/data/locations";
 
 export function GeoView({ page }: { page: LocationPage }) {
@@ -36,8 +39,26 @@ export function GeoView({ page }: { page: LocationPage }) {
               </p>
             ))}
           </div>
-          <div className="mx-auto mt-12 max-w-3xl">
-            <LeadForm mode="quick" title="Рассчитать мебель для этого региона" />
+        </Container>
+      </Section>
+      <Section className="bg-surface-2/40">
+        <Container>
+          <SectionHeading
+            title="Примеры стоимости"
+            text="Стартовые цены популярных решений. Точную сумму рассчитаем по размерам вашего помещения."
+          />
+          <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+          <StartingPriceNote href="#lead" cta="Рассчитать стоимость" />
+        </Container>
+      </Section>
+      <Section>
+        <Container>
+          <div className="mx-auto max-w-3xl">
+            <LeadForm id="lead" mode="quick" title="Рассчитать мебель для этого региона" />
           </div>
         </Container>
       </Section>

@@ -96,10 +96,12 @@ export function serviceJsonLd({
   name,
   description,
   path,
+  priceFrom,
 }: {
   name: string;
   description: string;
   path: string;
+  priceFrom?: number;
 }): Record<string, unknown> {
   return {
     "@context": "https://schema.org",
@@ -119,5 +121,15 @@ export function serviceJsonLd({
       },
     },
     areaServed: siteConfig.region,
+    ...(priceFrom
+      ? {
+          offers: {
+            "@type": "AggregateOffer",
+            priceCurrency: "RUB",
+            lowPrice: priceFrom,
+            availability: "https://schema.org/PreOrder",
+          },
+        }
+      : {}),
   };
 }

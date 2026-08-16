@@ -14,6 +14,7 @@ import { FAQ } from "@/components/FAQ";
 import { LeadForm } from "@/components/LeadForm";
 import { JsonLd } from "@/components/JsonLd";
 import { ButtonLink } from "@/components/ui/Button";
+import { StartingPriceNote } from "@/components/StartingPriceNote";
 import { Container, Section, SectionHeading } from "@/components/ui/Layout";
 import { absUrl } from "@/lib/utils";
 
@@ -98,18 +99,7 @@ export default async function PricesPage({
             ))}
           </div>
 
-          <aside className="mt-10 rounded-[1.4rem] bg-accent-soft p-6 ring-1 ring-accent/15 md:p-8">
-            <p className="font-display text-2xl leading-snug text-graphite md:text-3xl">
-              Указаны стартовые цены на базовые варианты. Итоговая стоимость зависит от размеров,
-              материалов, фасадов, фурнитуры, наполнения и сложности проекта.
-            </p>
-            <p className="mt-4 text-base leading-relaxed text-graphite md:text-lg">
-              Точную стоимость рассчитаем после получения размеров или фотографии помещения.
-            </p>
-            <div className="mt-6">
-              <ButtonLink href="#lead">Рассчитать мою мебель</ButtonLink>
-            </div>
-          </aside>
+          <StartingPriceNote href="#lead" cta="Рассчитать мою мебель" />
         </Container>
       </Section>
 

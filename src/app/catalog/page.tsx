@@ -5,6 +5,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { CTASection } from "@/components/CTASection";
 import { JsonLd } from "@/components/JsonLd";
 import { Container, Section, SectionHeading } from "@/components/ui/Layout";
+import { StartingPriceNote } from "@/components/StartingPriceNote";
 import { cta } from "@/config/site";
 
 export const metadata = buildMetadata({
@@ -41,6 +42,7 @@ export default function CatalogPage() {
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
+          <StartingPriceNote href="/calculator" cta="Рассчитать стоимость" />
         </Container>
       </Section>
       <CTASection

@@ -1,5 +1,9 @@
 import Link from "next/link";
-import { products } from "@/data/products";
+import {
+  productById,
+  productsForCategory,
+  startingProduct,
+} from "@/data/products";
 import type { ServiceContent } from "@/data/services";
 import { cta } from "@/config/site";
 import { Hero } from "@/components/Hero";
@@ -7,15 +11,18 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { FAQ } from "@/components/FAQ";
 import { LeadForm } from "@/components/LeadForm";
 import { ProductCard } from "@/components/ProductCard";
+import { StartingPriceNote } from "@/components/StartingPriceNote";
 import { CTASection } from "@/components/CTASection";
 import { MessengerButtons } from "@/components/MessengerButtons";
 import { JsonLd } from "@/components/JsonLd";
 import { MediaImage } from "@/components/ui/MediaImage";
+import { ButtonLink } from "@/components/ui/Button";
 import { Container, Section, SectionHeading } from "@/components/ui/Layout";
 import { breadcrumbsJsonLd, faqJsonLd, serviceJsonLd } from "@/lib/seo";
 
 export function ServicePage({ service }: { service: ServiceContent }) {
-  const relatedProducts = products.filter((item) => item.category === service.category);
+  const relatedProducts = productsForCategory(service.category);
+  const start = startingProduct(service.category);
 
   return (
     <>
@@ -29,6 +36,7 @@ export function ServicePage({ service }: { service: ServiceContent }) {
             name: service.h1,
             description: service.description,
             path: service.href,
+            priceFrom: start?.priceFrom,
           }),
           faqJsonLd(service.faq),
         ]}
@@ -61,11 +69,19 @@ export function ServicePage({ service }: { service: ServiceContent }) {
             </div>
             <div className="lg:col-span-5">
               <div className="rounded-[1.25rem] bg-accent-soft p-6">
-                <p className="font-display text-2xl text-graphite">Как получить расчёт</p>
-                <p className="mt-3 text-sm leading-relaxed text-muted">
-                  Укажите размеры, пожелания и телефон. Можно приложить фото помещения, план или
-                  эскиз. Или напишите в WhatsApp или Telegram — так быстрее согласовать детали.
-                </p>
+                <p className="font-display text-2xl text-graphite">Стартовая стоимость</p>
+                {start ? (
+                  <>
+                    <p className="mt-3 font-display text-4xl text-graphite">{start.priceLabel}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-muted">
+                      Базовый вариант. Итоговую сумму рассчитаем по вашим размерам и комплектации.
+                    </p>
+                  </>
+                ) : (
+                  <p className="mt-3 text-sm leading-relaxed text-muted">
+                    Укажите размеры, пожелания и телефон — подготовим предложение.
+                  </p>
+                )}
                 <Link href="#lead" className="mt-4 inline-block text-sm font-medium text-accent">
                   {service.ctaLabel} →
                 </Link>
@@ -96,20 +112,38 @@ export function ServicePage({ service }: { service: ServiceContent }) {
         <Container>
           <SectionHeading title={service.variantsTitle} />
           <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {service.variants.map((item) => (
-              <article
-                key={item.title}
-                className="overflow-hidden rounded-[1.25rem] bg-surface ring-1 ring-border"
-              >
-                <div className="relative aspect-[4/3]">
-                  <MediaImage src={item.image} alt={item.imageAlt} />
-                </div>
-                <div className="p-5">
-                  <h3 className="font-display text-2xl">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted">{item.text}</p>
-                </div>
-              </article>
-            ))}
+            {service.variants.map((item) => {
+              const product = productById(item.productId) || start;
+              return (
+                <article
+                  key={item.title}
+                  className="flex h-full flex-col overflow-hidden rounded-[1.25rem] bg-surface ring-1 ring-border"
+                >
+                  <div className="relative aspect-[4/3]">
+                    <MediaImage src={item.image} alt={item.imageAlt} />
+                    {product ? (
+                      <span className="absolute right-3 top-3 rounded-full bg-surface/95 px-3 py-1.5 text-sm font-semibold text-graphite shadow-soft">
+                        {product.priceLabel}
+                      </span>
+                    ) : null}
+                  </div>
+                  <div className="flex flex-1 flex-col p-5">
+                    <h3 className="font-display text-2xl">{item.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-muted">{item.text}</p>
+                    {product ? (
+                      <>
+                        <p className="mt-4 font-display text-2xl text-graphite">{product.priceLabel}</p>
+                        <div className="mt-4">
+                          <ButtonLink href="#lead" className="w-full">
+                            {product.ctaLabel}
+                          </ButtonLink>
+                        </div>
+                      </>
+                    ) : null}
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </Container>
       </Section>
@@ -118,14 +152,15 @@ export function ServicePage({ service }: { service: ServiceContent }) {
         <Section className="bg-surface-2/40">
           <Container>
             <SectionHeading
-              title="Примеры комплектаций"
-              text="Ориентиры по составу. Сумма появляется после расчёта по вашим размерам и материалам."
+              title="Примеры стоимости"
+              text="Стартовые цены популярных решений. Каждый проект рассчитывается по вашим размерам."
             />
             <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {relatedProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
+            <StartingPriceNote href="#lead" cta={service.ctaLabel} />
           </Container>
         </Section>
       ) : null}

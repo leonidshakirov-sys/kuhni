@@ -4,7 +4,6 @@ import Link from "next/link";
 import { ButtonLink } from "@/components/ui/Button";
 import { MediaImage } from "@/components/ui/MediaImage";
 import { trackEvent } from "@/lib/analytics";
-import { formatProductPrice } from "@/lib/utils";
 import type { Product } from "@/data/products";
 
 export function ProductCard({
@@ -38,7 +37,7 @@ export function ProductCard({
         </ul>
         <p className="mt-3 text-xs uppercase tracking-wide text-muted-2">Комплектация</p>
         <p className="mt-1 text-sm text-muted">{product.kit.join(" · ")}</p>
-        <p className="mt-4 font-display text-2xl text-graphite">{formatProductPrice(product.price)}</p>
+        <p className="mt-4 font-display text-2xl text-graphite">{product.priceLabel}</p>
         <div className="mt-4">
           <ButtonLink
             href={`/calculator?product=${product.id}`}

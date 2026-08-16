@@ -4,9 +4,12 @@ export function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 
+export function formatPriceFrom(amount: number): string {
+  return `от ${amount.toLocaleString("ru-RU")} ₽`;
+}
+
 export function formatProductPrice(price: ProductPrice): string {
-  if (price.type === "quote") return "Цена по расчёту";
-  return `от ${price.amount.toLocaleString("ru-RU")} ₽`;
+  return formatPriceFrom(price.amount);
 }
 
 export function absUrl(path: string, origin?: string) {

@@ -6,6 +6,7 @@ export interface ServiceVariant {
   text: string;
   image: string;
   imageAlt: string;
+  productId?: string;
 }
 
 export interface ServiceContent {
@@ -77,12 +78,14 @@ export const services: ServiceContent[] = [
         text: "Линейный гарнитур вдоль одной стены. Подходит для узких кухонь, студий и помещений, где важно оставить проход.",
         image: "/images/kitchens/straight.webp",
         imageAlt: "Пример прямой кухни",
+        productId: "kitchen-straight-240",
       },
       {
         title: "Угловые",
         text: "Г-образная планировка использует две стены и угол. Даёт больше столешницы и место под мойку или варочную панель.",
         image: "/images/kitchens/corner.webp",
         imageAlt: "Пример угловой кухни",
+        productId: "kitchen-corner",
       },
       {
         title: "П-образные",
@@ -147,7 +150,7 @@ export const services: ServiceContent[] = [
           "Да. Высокие верхние шкафы и пеналы считаются по высоте помещения. Это отдельный пункт в расчёте: добавляется корпус, фасады и сложность монтажа.",
       },
       {
-        question: "Почему нет цены сразу на сайте?",
+        question: "Почему на сайте указана стартовая цена?",
         answer:
           "На сайте указаны стартовые цены базовых решений. Итоговая стоимость кухни зависит от размеров, фасадов, столешницы, фурнитуры и наполнения — считаем по вашему заданию.",
       },
@@ -196,6 +199,7 @@ export const services: ServiceContent[] = [
         text: "Каркас опирается на стены, пол и потолок ниши. Нет боковых щелей и «лишнего» корпуса там, где он не нужен.",
         image: "/images/wardrobes/builtin.webp",
         imageAlt: "Пример встроенного шкафа",
+        productId: "wardrobe-builtin",
       },
       {
         title: "Распашные",
@@ -304,6 +308,7 @@ export const services: ServiceContent[] = [
         text: "Система опирается на стены ниши. Экономит материал корпуса и плотно закрывает проём.",
         image: "/images/sliding-wardrobes/combined.webp",
         imageAlt: "Пример встроенного шкафа-купе",
+        productId: "sliding-200",
       },
       {
         title: "Корпусные",
@@ -412,6 +417,7 @@ export const services: ServiceContent[] = [
         text: "Полноценное помещение со стеллажами по периметру. Максимум хранения и удобный проход.",
         image: "/images/walk-in-closets/main.webp",
         imageAlt: "Пример гардеробной в отдельной комнате",
+        productId: "walk-in",
       },
       {
         title: "Небольшая гардеробная",
@@ -520,6 +526,7 @@ export const services: ServiceContent[] = [
         text: "Длинная низкая тумба под телевизор, с местом под приставку, провода и закрытым хранением.",
         image: "/images/cabinets/tv.webp",
         imageAlt: "Пример ТВ-тумбы",
+        productId: "cabinet",
       },
       {
         title: "Подвесные тумбы",
@@ -605,6 +612,7 @@ export const services: ServiceContent[] = [
         text: "Ряд ящиков в спокойном объёме. Подходит для спальни и гостиной.",
         image: "/images/dressers/classic.webp",
         imageAlt: "Пример классического комода",
+        productId: "dresser",
       },
       {
         title: "Комод по нестандартным размерам",
@@ -689,18 +697,21 @@ export const services: ServiceContent[] = [
         text: "Гарнитуры по стенам, с техникой, столешницей и пеналами.",
         image: "/images/kitchens/modern.webp",
         imageAlt: "Кухня на заказ",
+        productId: "kitchen-straight-240",
       },
       {
         title: "Системы хранения",
         text: "Шкафы, купе и гардеробные для одежды и хозяйственных вещей.",
         image: "/images/wardrobes/builtin.webp",
         imageAlt: "Система хранения на заказ",
+        productId: "wardrobe-builtin",
       },
       {
         title: "Тумбы и комоды",
         text: "Низкие и высокие корпуса для гостиной, спальни и прихожей.",
         image: "/images/cabinets/living.webp",
         imageAlt: "Тумба и комод на заказ",
+        productId: "cabinet",
       },
       {
         title: "Нестандартные корпуса",

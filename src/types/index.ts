@@ -9,9 +9,7 @@ export type FormMode =
   | "dresser"
   | "prices";
 
-export type ProductPrice =
-  | { type: "quote" }
-  | { type: "from"; amount: number };
+export type ProductPrice = { type: "from"; amount: number };
 
 export type FurnitureCategory =
   | "kitchen"

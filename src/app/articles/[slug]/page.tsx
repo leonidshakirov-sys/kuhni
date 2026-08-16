@@ -77,7 +77,8 @@ export default async function ArticlePage({
             <div className="mt-10 rounded-[1.25rem] bg-accent-soft p-6">
               <p className="font-display text-2xl">Нужен расчёт по своим размерам?</p>
               <p className="mt-2 text-sm text-muted">
-                Перейдите на страницу услуги или сразу в квиз — без случайных цен, по вашему заданию.
+                На сайте указаны стартовые цены базовых решений. Точную стоимость рассчитаем по вашим
+                размерам — через страницу услуги или квиз.
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <ButtonLink href={article.serviceHref}>{article.serviceLabel}</ButtonLink>

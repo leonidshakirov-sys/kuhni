@@ -20,6 +20,7 @@ import { ArticleCard } from "@/components/ArticleCard";
 import { JsonLd } from "@/components/JsonLd";
 import { Container, Section, SectionHeading } from "@/components/ui/Layout";
 import { ButtonLink } from "@/components/ui/Button";
+import { StartingPriceNote } from "@/components/StartingPriceNote";
 
 export const metadata = buildMetadata({
   title: "Корпусная мебель на заказ в Москве и МО",
@@ -93,6 +94,7 @@ export default function HomePage() {
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
+          <StartingPriceNote href="/calculator" cta="Рассчитать стоимость" />
         </Container>
       </Section>
 
@@ -125,7 +127,7 @@ export default function HomePage() {
         secondary={{ href: "tel:+79162659262", label: "Позвонить" }}
       />
 
-      <FAQ items={homeFaq} text="Коротко о расчёте, регионе и том, почему на сайте нет случайных цен." />
+      <FAQ items={homeFaq} text="Коротко о расчёте, регионе и стартовых ценах на базовые решения." />
 
       <Section>
         <Container>
