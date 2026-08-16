@@ -6,7 +6,8 @@ export type FormMode =
   | "custom"
   | "sliding"
   | "cabinet"
-  | "dresser";
+  | "dresser"
+  | "prices";
 
 export type ProductPrice =
   | { type: "quote" }

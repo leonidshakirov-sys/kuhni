@@ -5,7 +5,13 @@ export type AnalyticsEvent =
   | "telegram_click"
   | "calculator_complete"
   | "catalog_cta"
-  | "portfolio_cta";
+  | "portfolio_cta"
+  | "price_card_click"
+  | "price_calculate_click"
+  | "price_form_start"
+  | "price_form_submit"
+  | "price_whatsapp_click"
+  | "price_phone_click";
 
 declare global {
   interface Window {

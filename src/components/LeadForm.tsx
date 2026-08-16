@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import type { FormMode } from "@/types";
 import { legalLinks, siteConfig } from "@/config/site";
+import { furnitureOptionByProductId, furnitureTypeByProductId, products } from "@/data/products";
 import { trackEvent } from "@/lib/analytics";
 import { getStoredUtm } from "@/lib/utm";
 import { formatPhoneInput, isValidRuPhone } from "@/lib/utils";
@@ -21,6 +22,14 @@ const furnitureOptions = [
   "Другое",
 ];
 
+const budgetOptions = [
+  "до 100 000 ₽",
+  "100 000–200 000 ₽",
+  "200 000–350 000 ₽",
+  "350 000 ₽ и выше",
+  "пока не знаю",
+];
+
 const kitchenTypes = ["прямая", "угловая", "П-образная", "другая"];
 const doorTypes = ["Распашные", "Купе", "Комбинированные", "Пока не знаю"];
 const MAX_FILES = 5;
@@ -31,11 +40,15 @@ export function LeadForm({
   title,
   submitLabel = "Получить расчёт",
   id,
+  productId,
+  intro,
 }: {
   mode?: FormMode;
   title?: string;
   submitLabel?: string;
   id?: string;
+  productId?: string;
+  intro?: string;
 }) {
   const headings: Record<FormMode, string> = {
     quick: "Рассчитайте мебель по вашим размерам",
@@ -46,13 +59,17 @@ export function LeadForm({
     custom: "Получить предложение",
     cabinet: "Рассчитать тумбу",
     dresser: "Рассчитать комод",
+    prices: "Рассчитаем стоимость вашей мебели",
   };
+  const isPrices = mode === "prices";
+  const started = useRef(false);
+  const furnitureFromProduct = furnitureOptionByProductId(productId);
 
   const [values, setValues] = useState<Record<string, string>>({
     name: "",
     phone: "",
     comment: "",
-    furnitureType: modeDefaultFurniture(mode),
+    furnitureType: furnitureFromProduct || modeDefaultFurniture(mode),
     kitchenType: "",
     sizes: "",
     facade: "",
@@ -80,7 +97,28 @@ export function LeadForm({
 
   const visible = useMemo(() => fieldMap[mode], [mode]);
 
+  useEffect(() => {
+    if (!productId) return;
+    const option = furnitureOptionByProductId(productId);
+    const product = products.find((item) => item.id === productId);
+    setValues((prev) => ({
+      ...prev,
+      furnitureType: option || prev.furnitureType,
+      comment:
+        prev.comment || (product ? `Интересует вариант: ${product.title}` : prev.comment),
+    }));
+  }, [productId]);
+
+  function markFormStart() {
+    if (started.current || !isPrices) return;
+    started.current = true;
+    trackEvent("price_form_start", {
+      furniture: furnitureTypeByProductId(productId) || values.furnitureType || "any",
+    });
+  }
+
   function setField(name: string, value: string) {
+    markFormStart();
     setValues((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
   }
@@ -121,6 +159,7 @@ export function LeadForm({
     for (const key of visible) {
       if (values[key]) fields[key] = values[key];
     }
+    if (productId) fields.productId = productId;
     formData.append("fields", JSON.stringify(fields));
     files.forEach((file) => formData.append("files", file));
 
@@ -134,7 +173,11 @@ export function LeadForm({
         throw new Error(data.error || "Не удалось отправить заявку");
       }
       setStatus("success");
-      trackEvent("lead_submit", { form: mode });
+      const furniture = furnitureTypeByProductId(productId) || values.furnitureType || "any";
+      trackEvent("lead_submit", { form: mode, furniture });
+      if (isPrices) {
+        trackEvent("price_form_submit", { furniture, product: productId || "none" });
+      }
     } catch {
       setStatus("error");
       setMessage("Не получилось отправить заявку. Напишите в WhatsApp или Telegram.");
@@ -142,6 +185,7 @@ export function LeadForm({
   }
 
   function onFiles(list: FileList | null) {
+    markFormStart();
     if (!list) return;
     const next = [...files];
     for (const file of Array.from(list)) {
@@ -172,6 +216,68 @@ export function LeadForm({
     );
   }
 
+  const namePhone = (
+    <>
+      <Field
+        label="Имя"
+        name="name"
+        value={values.name}
+        error={errors.name}
+        onChange={(v) => setField("name", v)}
+        autoComplete="name"
+      />
+      <Field
+        label="Телефон"
+        name="phone"
+        type="tel"
+        value={values.phone}
+        error={errors.phone}
+        onChange={(v) => setField("phone", formatPhoneInput(v))}
+        autoComplete="tel"
+        placeholder="+7 9XX XXX-XX-XX"
+      />
+    </>
+  );
+
+  const commentField = (
+    <div className="md:col-span-2">
+      <label className="mb-1.5 block text-sm font-medium" htmlFor={`${mode}-comment`}>
+        Комментарий
+      </label>
+      <textarea
+        id={`${mode}-comment`}
+        name="comment"
+        rows={4}
+        value={values.comment}
+        onChange={(e) => setField("comment", e.target.value)}
+        className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm outline-none ring-accent focus:ring-2"
+      />
+    </div>
+  );
+
+  const filesField = (
+    <div className="md:col-span-2">
+      <label className="mb-1.5 block text-sm font-medium" htmlFor={`${mode}-files`}>
+        {isPrices ? "Фото помещения, эскиз или план" : "Фото помещения, план или эскиз"}
+      </label>
+      <input
+        id={`${mode}-files`}
+        name="files"
+        type="file"
+        multiple
+        accept="image/*,.pdf,.heic"
+        onChange={(e) => onFiles(e.target.files)}
+        className="block w-full text-sm text-muted file:mr-4 file:rounded-full file:border-0 file:bg-accent-soft file:px-4 file:py-2 file:text-sm file:font-medium file:text-graphite"
+      />
+      {files.length > 0 ? (
+        <p className="mt-2 text-xs text-muted">
+          Выбрано файлов: {files.length} из {MAX_FILES}
+        </p>
+      ) : null}
+      {errors.files ? <p className="mt-1 text-xs text-error">{errors.files}</p> : null}
+    </div>
+  );
+
   return (
     <form
       id={id}
@@ -180,219 +286,202 @@ export function LeadForm({
       noValidate
     >
       <h2 className="font-display text-3xl text-graphite">{title || headings[mode]}</h2>
-      <p className="mt-2 text-sm text-muted">
-        Поля с именем и телефоном обязательны. Фото, план или эскиз можно приложить к заявке.{" "}
-        {siteConfig.messengersNote}
+      <p className="mt-2 text-sm text-muted md:text-base">
+        {intro ||
+          `Поля с именем и телефоном обязательны. Фото, план или эскиз можно приложить к заявке. ${siteConfig.messengersNote}`}
       </p>
       <div className="mt-4">
-        <MessengerButtons place="lead_form" />
+        <MessengerButtons place={isPrices ? "prices_form" : "lead_form"} />
       </div>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <Field
-          label="Имя"
-          name="name"
-          value={values.name}
-          error={errors.name}
-          onChange={(v) => setField("name", v)}
-          autoComplete="name"
-        />
-        <Field
-          label="Телефон"
-          name="phone"
-          type="tel"
-          value={values.phone}
-          error={errors.phone}
-          onChange={(v) => setField("phone", formatPhoneInput(v))}
-          autoComplete="tel"
-          placeholder="+7 9XX XXX-XX-XX"
-        />
+        {isPrices ? (
+          <>
+            <SelectField
+              label="Что нужно изготовить"
+              name="furnitureType"
+              value={values.furnitureType}
+              options={furnitureOptions}
+              onChange={(v) => setField("furnitureType", v)}
+            />
+            <Field
+              label="Размеры"
+              name="sizes"
+              value={values.sizes}
+              onChange={(v) => setField("sizes", v)}
+              placeholder="Ширина, высота, глубина или длины стен"
+            />
+            <SelectField
+              className="md:col-span-2"
+              label="Примерный бюджет"
+              name="budget"
+              value={values.budget}
+              options={budgetOptions}
+              onChange={(v) => setField("budget", v)}
+            />
+            {commentField}
+            {filesField}
+            {namePhone}
+          </>
+        ) : (
+          <>
+            {namePhone}
 
-        {visible.includes("furnitureType") ? (
-          <SelectField
-            label="Что нужно"
-            name="furnitureType"
-            value={values.furnitureType}
-            options={furnitureOptions}
-            onChange={(v) => setField("furnitureType", v)}
-          />
-        ) : null}
+            {visible.includes("furnitureType") ? (
+              <SelectField
+                label="Что нужно"
+                name="furnitureType"
+                value={values.furnitureType}
+                options={furnitureOptions}
+                onChange={(v) => setField("furnitureType", v)}
+              />
+            ) : null}
 
-        {visible.includes("kitchenType") ? (
-          <SelectField
-            label="Тип кухни"
-            name="kitchenType"
-            value={values.kitchenType}
-            options={kitchenTypes}
-            error={errors.kitchenType}
-            onChange={(v) => setField("kitchenType", v)}
-          />
-        ) : null}
+            {visible.includes("kitchenType") ? (
+              <SelectField
+                label="Тип кухни"
+                name="kitchenType"
+                value={values.kitchenType}
+                options={kitchenTypes}
+                error={errors.kitchenType}
+                onChange={(v) => setField("kitchenType", v)}
+              />
+            ) : null}
 
-        {visible.includes("sizes") ? (
-          <Field
-            className="md:col-span-2"
-            label="Размеры кухни"
-            name="sizes"
-            value={values.sizes}
-            onChange={(v) => setField("sizes", v)}
-            placeholder="Например: стена 320 см, стена 180 см, высота 265 см"
-          />
-        ) : null}
+            {visible.includes("sizes") ? (
+              <Field
+                className="md:col-span-2"
+                label="Размеры кухни"
+                name="sizes"
+                value={values.sizes}
+                onChange={(v) => setField("sizes", v)}
+                placeholder="Например: стена 320 см, стена 180 см, высота 265 см"
+              />
+            ) : null}
 
-        {visible.includes("roomSizes") ? (
-          <Field
-            className="md:col-span-2"
-            label="Размеры помещения"
-            name="roomSizes"
-            value={values.roomSizes}
-            onChange={(v) => setField("roomSizes", v)}
-            placeholder="Длина, ширина, высота комнаты или ниши"
-          />
-        ) : null}
+            {visible.includes("roomSizes") ? (
+              <Field
+                className="md:col-span-2"
+                label="Размеры помещения"
+                name="roomSizes"
+                value={values.roomSizes}
+                onChange={(v) => setField("roomSizes", v)}
+                placeholder="Длина, ширина, высота комнаты или ниши"
+              />
+            ) : null}
 
-        {visible.includes("width") ? (
-          <Field label="Ширина, см" name="width" value={values.width} onChange={(v) => setField("width", v)} />
-        ) : null}
-        {visible.includes("height") ? (
-          <Field label="Высота, см" name="height" value={values.height} onChange={(v) => setField("height", v)} />
-        ) : null}
-        {visible.includes("depth") ? (
-          <Field label="Глубина, см" name="depth" value={values.depth} onChange={(v) => setField("depth", v)} />
-        ) : null}
+            {visible.includes("width") ? (
+              <Field label="Ширина, см" name="width" value={values.width} onChange={(v) => setField("width", v)} />
+            ) : null}
+            {visible.includes("height") ? (
+              <Field label="Высота, см" name="height" value={values.height} onChange={(v) => setField("height", v)} />
+            ) : null}
+            {visible.includes("depth") ? (
+              <Field label="Глубина, см" name="depth" value={values.depth} onChange={(v) => setField("depth", v)} />
+            ) : null}
 
-        {visible.includes("doorType") ? (
-          <SelectField
-            label="Тип дверей"
-            name="doorType"
-            value={values.doorType}
-            options={doorTypes}
-            onChange={(v) => setField("doorType", v)}
-          />
-        ) : null}
-        {visible.includes("sections") ? (
-          <Field
-            label="Количество секций"
-            name="sections"
-            value={values.sections}
-            onChange={(v) => setField("sections", v)}
-          />
-        ) : null}
-        {visible.includes("filling") ? (
-          <Field
-            className="md:col-span-2"
-            label="Внутреннее наполнение"
-            name="filling"
-            value={values.filling}
-            onChange={(v) => setField("filling", v)}
-            placeholder="Полки, ящики, штанги, обувницы…"
-          />
-        ) : null}
-        {visible.includes("layout") ? (
-          <SelectField
-            label="Планировка"
-            name="layout"
-            value={values.layout}
-            options={["Отдельная комната", "Небольшая", "Угловая", "П-образная", "Встроенная"]}
-            onChange={(v) => setField("layout", v)}
-          />
-        ) : null}
-        {visible.includes("facade") ? (
-          <Field
-            label="Желаемый материал фасада"
-            name="facade"
-            value={values.facade}
-            onChange={(v) => setField("facade", v)}
-          />
-        ) : null}
-        {visible.includes("countertop") ? (
-          <Field
-            label="Столешница"
-            name="countertop"
-            value={values.countertop}
-            onChange={(v) => setField("countertop", v)}
-          />
-        ) : null}
-        {visible.includes("hardware") ? (
-          <Field
-            label="Фурнитура"
-            name="hardware"
-            value={values.hardware}
-            onChange={(v) => setField("hardware", v)}
-          />
-        ) : null}
-        {visible.includes("appliances") ? (
-          <Field
-            className="md:col-span-2"
-            label="Необходимость размещения техники"
-            name="appliances"
-            value={values.appliances}
-            onChange={(v) => setField("appliances", v)}
-            placeholder="Холодильник, духовка, посудомоечная машина…"
-          />
-        ) : null}
-        {visible.includes("color") ? (
-          <Field label="Цвет" name="color" value={values.color} onChange={(v) => setField("color", v)} />
-        ) : null}
-        {visible.includes("material") ? (
-          <Field
-            label="Материал"
-            name="material"
-            value={values.material}
-            onChange={(v) => setField("material", v)}
-          />
-        ) : null}
-        {visible.includes("budget") ? (
-          <Field
-            label="Примерный бюджет"
-            name="budget"
-            value={values.budget}
-            onChange={(v) => setField("budget", v)}
-          />
-        ) : null}
-        {visible.includes("timing") ? (
-          <Field
-            label="Желаемый срок"
-            name="timing"
-            value={values.timing}
-            onChange={(v) => setField("timing", v)}
-          />
-        ) : null}
+            {visible.includes("doorType") ? (
+              <SelectField
+                label="Тип дверей"
+                name="doorType"
+                value={values.doorType}
+                options={doorTypes}
+                onChange={(v) => setField("doorType", v)}
+              />
+            ) : null}
+            {visible.includes("sections") ? (
+              <Field
+                label="Количество секций"
+                name="sections"
+                value={values.sections}
+                onChange={(v) => setField("sections", v)}
+              />
+            ) : null}
+            {visible.includes("filling") ? (
+              <Field
+                className="md:col-span-2"
+                label="Внутреннее наполнение"
+                name="filling"
+                value={values.filling}
+                onChange={(v) => setField("filling", v)}
+                placeholder="Полки, ящики, штанги, обувницы…"
+              />
+            ) : null}
+            {visible.includes("layout") ? (
+              <SelectField
+                label="Планировка"
+                name="layout"
+                value={values.layout}
+                options={["Отдельная комната", "Небольшая", "Угловая", "П-образная", "Встроенная"]}
+                onChange={(v) => setField("layout", v)}
+              />
+            ) : null}
+            {visible.includes("facade") ? (
+              <Field
+                label="Желаемый материал фасада"
+                name="facade"
+                value={values.facade}
+                onChange={(v) => setField("facade", v)}
+              />
+            ) : null}
+            {visible.includes("countertop") ? (
+              <Field
+                label="Столешница"
+                name="countertop"
+                value={values.countertop}
+                onChange={(v) => setField("countertop", v)}
+              />
+            ) : null}
+            {visible.includes("hardware") ? (
+              <Field
+                label="Фурнитура"
+                name="hardware"
+                value={values.hardware}
+                onChange={(v) => setField("hardware", v)}
+              />
+            ) : null}
+            {visible.includes("appliances") ? (
+              <Field
+                className="md:col-span-2"
+                label="Необходимость размещения техники"
+                name="appliances"
+                value={values.appliances}
+                onChange={(v) => setField("appliances", v)}
+                placeholder="Холодильник, духовка, посудомоечная машина…"
+              />
+            ) : null}
+            {visible.includes("color") ? (
+              <Field label="Цвет" name="color" value={values.color} onChange={(v) => setField("color", v)} />
+            ) : null}
+            {visible.includes("material") ? (
+              <Field
+                label="Материал"
+                name="material"
+                value={values.material}
+                onChange={(v) => setField("material", v)}
+              />
+            ) : null}
+            {visible.includes("budget") ? (
+              <Field
+                label="Примерный бюджет"
+                name="budget"
+                value={values.budget}
+                onChange={(v) => setField("budget", v)}
+              />
+            ) : null}
+            {visible.includes("timing") ? (
+              <Field
+                label="Желаемый срок"
+                name="timing"
+                value={values.timing}
+                onChange={(v) => setField("timing", v)}
+              />
+            ) : null}
 
-        <div className="md:col-span-2">
-          <label className="mb-1.5 block text-sm font-medium" htmlFor={`${mode}-comment`}>
-            Комментарий
-          </label>
-          <textarea
-            id={`${mode}-comment`}
-            name="comment"
-            rows={4}
-            value={values.comment}
-            onChange={(e) => setField("comment", e.target.value)}
-            className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm outline-none ring-accent focus:ring-2"
-          />
-        </div>
-
-        <div className="md:col-span-2">
-          <label className="mb-1.5 block text-sm font-medium" htmlFor={`${mode}-files`}>
-            Фото помещения, план или эскиз
-          </label>
-          <input
-            id={`${mode}-files`}
-            name="files"
-            type="file"
-            multiple
-            accept="image/*,.pdf,.heic"
-            onChange={(e) => onFiles(e.target.files)}
-            className="block w-full text-sm text-muted file:mr-4 file:rounded-full file:border-0 file:bg-accent-soft file:px-4 file:py-2 file:text-sm file:font-medium file:text-graphite"
-          />
-          {files.length > 0 ? (
-            <p className="mt-2 text-xs text-muted">
-              Выбрано файлов: {files.length} из {MAX_FILES}
-            </p>
-          ) : null}
-          {errors.files ? <p className="mt-1 text-xs text-error">{errors.files}</p> : null}
-        </div>
+            {commentField}
+            {filesField}
+          </>
+        )}
       </div>
 
       <label className="mt-5 flex items-start gap-3 text-sm text-muted">
@@ -400,22 +489,36 @@ export function LeadForm({
           type="checkbox"
           checked={consent}
           onChange={(e) => {
+            markFormStart();
             setConsent(e.target.checked);
             setErrors((prev) => ({ ...prev, consent: "" }));
           }}
           className="mt-1 h-4 w-4 accent-accent"
         />
-        <span>
-          Соглашаюсь с{" "}
-          <Link href={legalLinks[0].href} className="text-accent underline underline-offset-2">
-            политикой конфиденциальности
-          </Link>{" "}
-          и даю{" "}
-          <Link href={legalLinks[1].href} className="text-accent underline underline-offset-2">
-            согласие на обработку персональных данных
-          </Link>
-          .
-        </span>
+        {isPrices ? (
+          <span>
+            Я согласен на обработку персональных данных.{" "}
+            <Link href={legalLinks[0].href} className="text-accent underline underline-offset-2">
+              Политика конфиденциальности
+            </Link>
+            {" · "}
+            <Link href={legalLinks[1].href} className="text-accent underline underline-offset-2">
+              Согласие на обработку персональных данных
+            </Link>
+          </span>
+        ) : (
+          <span>
+            Соглашаюсь с{" "}
+            <Link href={legalLinks[0].href} className="text-accent underline underline-offset-2">
+              политикой конфиденциальности
+            </Link>{" "}
+            и даю{" "}
+            <Link href={legalLinks[1].href} className="text-accent underline underline-offset-2">
+              согласие на обработку персональных данных
+            </Link>
+            .
+          </span>
+        )}
       </label>
       {errors.consent ? <p className="mt-1 text-xs text-error">{errors.consent}</p> : null}
 
@@ -464,6 +567,7 @@ const fieldMap: Record<FormMode, string[]> = {
   custom: ["furnitureType", "sizes", "material", "budget"],
   cabinet: ["width", "height", "depth", "color", "material", "budget"],
   dresser: ["width", "height", "depth", "color", "material", "budget"],
+  prices: ["furnitureType", "sizes", "budget"],
 };
 
 function modeDefaultFurniture(mode: FormMode) {
@@ -538,6 +642,7 @@ function SelectField({
   options,
   onChange,
   error,
+  className,
 }: {
   label: string;
   name: string;
@@ -545,10 +650,11 @@ function SelectField({
   options: string[];
   onChange: (value: string) => void;
   error?: string;
+  className?: string;
 }) {
   const id = `field-${name}`;
   return (
-    <div>
+    <div className={className}>
       <label htmlFor={id} className="mb-1.5 block text-sm font-medium">
         {label}
       </label>

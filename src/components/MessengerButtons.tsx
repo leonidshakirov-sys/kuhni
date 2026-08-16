@@ -33,7 +33,12 @@ export function MessengerButtons({
             "bg-[#128C7E] hover:bg-[#0e7368]",
           )}
           aria-label="Написать в WhatsApp"
-          onClick={() => trackEvent("whatsapp_click", { place })}
+          onClick={() => {
+            trackEvent("whatsapp_click", { place });
+            if (place.startsWith("prices")) {
+              trackEvent("price_whatsapp_click", { furniture: "any", place });
+            }
+          }}
         >
           <WhatsAppIcon className="h-4 w-4" />
           {variant === "icon" ? <span className="sr-only">WhatsApp</span> : "WhatsApp"}

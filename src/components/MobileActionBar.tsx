@@ -1,9 +1,47 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { siteConfig } from "@/config/site";
 import { trackEvent } from "@/lib/analytics";
 
 export function MobileActionBar() {
+  const pathname = usePathname();
+  const onPrices = pathname === "/prices";
+
+  if (onPrices) {
+    return (
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+        <div className="grid grid-cols-3 gap-1.5 px-2 py-2">
+          <a
+            href={siteConfig.phoneHref}
+            className="flex h-11 items-center justify-center rounded-full bg-graphite text-[12px] font-medium text-white"
+            onClick={() => trackEvent("price_phone_click", { furniture: "any", place: "prices_mobile_bar" })}
+          >
+            Позвонить
+          </a>
+          <a
+            href={siteConfig.whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex h-11 items-center justify-center rounded-full bg-[#128C7E] text-[12px] font-medium text-white"
+            onClick={() => trackEvent("price_whatsapp_click", { furniture: "any", place: "prices_mobile_bar" })}
+          >
+            WhatsApp
+          </a>
+          <a
+            href="#lead"
+            className="flex h-11 items-center justify-center rounded-full bg-accent text-[12px] font-medium text-white"
+            onClick={() =>
+              trackEvent("price_calculate_click", { furniture: "any", place: "prices_mobile_bar" })
+            }
+          >
+            Рассчитать
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
       <div className="grid grid-cols-4 gap-1.5 px-2 py-2">
