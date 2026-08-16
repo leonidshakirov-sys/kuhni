@@ -23,7 +23,7 @@ npm run dev
 | Переменная | Назначение |
 | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | Публичный адрес сайта без слэша в конце. Нужен для canonical, Open Graph и sitemap. |
-| `NEXT_PUBLIC_YANDEX_METRIKA_ID` | ID счётчика Яндекс.Метрики. Если пусто, счётчик не подключается. |
+| `NEXT_PUBLIC_YANDEX_METRIKA_ID` | ID счётчика Яндекс.Метрики. По умолчанию на сайте стоит `111656931`. |
 | `TELEGRAM_BOT_TOKEN` | Токен бота для заявок. |
 | `TELEGRAM_CHAT_ID` | Chat ID, куда уходят заявки. |
 
