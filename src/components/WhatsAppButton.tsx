@@ -16,8 +16,6 @@ export function WhatsAppButton({
   return (
     <a
       href={siteConfig.whatsappUrl}
-      target="_blank"
-      rel="noopener noreferrer"
       className={className}
       aria-label={label}
       onClick={() => trackEvent("whatsapp_click", { place: "button" })}

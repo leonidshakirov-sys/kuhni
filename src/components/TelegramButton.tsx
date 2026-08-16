@@ -16,8 +16,6 @@ export function TelegramButton({
   return (
     <a
       href={siteConfig.telegramUrl}
-      target="_blank"
-      rel="noopener noreferrer"
       className={className}
       aria-label={label}
       onClick={() => trackEvent("telegram_click", { place: "button" })}

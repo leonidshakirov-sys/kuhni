@@ -142,8 +142,6 @@ export function Header() {
           <p className="px-4 pt-2 text-sm text-muted">{siteConfig.messengersNote}</p>
           <a
             href={siteConfig.whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
             className="block rounded-2xl px-4 py-3 text-base font-medium"
             onClick={() => {
               trackEvent("whatsapp_click", { place: "mobile_menu" });
@@ -154,8 +152,6 @@ export function Header() {
           </a>
           <a
             href={siteConfig.telegramUrl}
-            target="_blank"
-            rel="noopener noreferrer"
             className="block rounded-2xl px-4 py-3 text-base font-medium"
             onClick={() => {
               trackEvent("telegram_click", { place: "mobile_menu" });

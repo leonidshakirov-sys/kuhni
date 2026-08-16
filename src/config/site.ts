@@ -10,8 +10,10 @@ export const siteConfig = {
   phoneDisplay: "+7 916 265-92-62",
   phoneHref: "tel:+79162659262",
   phoneDigits: "79162659262",
+  // wa.me opens the WhatsApp app on phones; do not add target=_blank (iOS blocks it).
   whatsappUrl: "https://wa.me/79162659262",
-  telegramUrl: "https://t.me/+79162659262",
+  // t.me/+7916… is treated as a group invite, not a phone chat.
+  telegramUrl: "tg://resolve?phone=79162659262",
   messengersNote: "Свяжитесь с нами в WhatsApp или Telegram.",
   address: "32-й км МКАД, владение 15",
   region: "Москва и Московская область",
