@@ -104,9 +104,11 @@ ln -sf /etc/nginx/sites-available/vrazmerdom /etc/nginx/sites-enabled/vrazmerdom
 rm -f /etc/nginx/sites-enabled/default
 nginx -t
 systemctl reload nginx
+curl -sI http://<BEGET_PUBLIC_IPV4>/ | head
 ```
 
 Пока DNS не переключён, Certbot не выпустит сертификат на домен.
+Сайт должен открываться по `http://<BEGET_PUBLIC_IPV4>/` (HTTP 200).
 
 ## 9. Certbot (только после DNS на IP VPS)
 
