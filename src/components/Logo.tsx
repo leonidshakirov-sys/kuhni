@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
 
@@ -14,18 +13,20 @@ export function Logo({
   return (
     <span
       className={cn(
-        "inline-flex items-center",
+        "inline-flex min-w-0 max-w-full items-center",
         inverted && "rounded-xl bg-white px-3 py-2",
         className,
       )}
     >
-      <Image
+      {/* Plain img: next/image WebP via /_next/image breaks on some Android browsers. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src="/images/brand/logo.png"
         alt={siteConfig.fullName}
         width={400}
         height={154}
-        sizes="(max-width: 640px) 140px, 200px"
-        priority
+        decoding="async"
+        fetchPriority="high"
         className={cn(
           "h-9 w-auto max-w-[min(100%,9.25rem)] sm:h-11 sm:max-w-[13.5rem]",
           compact && "h-8 max-w-[8.75rem] sm:h-10 sm:max-w-[12.5rem]",
