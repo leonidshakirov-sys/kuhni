@@ -26,6 +26,9 @@ Vercel в production не используется.
 ssh root@<BEGET_PUBLIC_IPV4>
 ```
 
+Если `api.telegram.org` не открывается, в `/etc/resolv.conf` не должно быть
+`198.18.18.18`. Рабочие DNS: `8.8.8.8` и `1.1.1.1`.
+
 ## 2. Пакеты и Node.js 20
 
 ```bash

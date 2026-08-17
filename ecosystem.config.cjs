@@ -13,6 +13,8 @@ module.exports = {
       env: {
         NODE_ENV: "production",
         PORT: "3000",
+        // Beget IPv6 to api.telegram.org is broken; prefer IPv4.
+        NODE_OPTIONS: "--dns-result-order=ipv4first",
       },
     },
   ],
