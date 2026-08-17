@@ -10,8 +10,8 @@ const MAX_FILE_SIZE = 8 * 1024 * 1024;
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const name = String(formData.get("name") || "").trim();
-    const phone = String(formData.get("phone") || "").trim();
+    const name = String(formData.get("leadName") || formData.get("name") || "").trim();
+    const phone = String(formData.get("leadPhone") || formData.get("phone") || "").trim();
     const comment = String(formData.get("comment") || "").trim();
     const formType = String(formData.get("formType") || "quick");
     const page = String(formData.get("page") || "");
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     const fieldsRaw = String(formData.get("fields") || "{}");
     const utmRaw = String(formData.get("utm") || "{}");
 
-    if (!name || name.length < 2) {
+    if (!name) {
       return NextResponse.json({ ok: false, error: "Укажите имя" }, { status: 400 });
     }
     if (!isValidRuPhone(phone)) {
@@ -71,10 +71,14 @@ export async function POST(request: NextRequest) {
     let delivered = false;
     if (isTelegramConfigured()) {
       await sendTelegramMessage(lines.join("\n"));
-      for (const file of files) {
-        await sendTelegramDocument(file, `${name} / ${phone} / ${file.name}`);
-      }
       delivered = true;
+      for (const file of files) {
+        try {
+          await sendTelegramDocument(file, `${name} / ${phone} / ${file.name}`);
+        } catch {
+          // A bad phone photo must not lose the lead itself.
+        }
+      }
     }
 
     return NextResponse.json({ ok: true, delivered });
