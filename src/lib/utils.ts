@@ -46,3 +46,21 @@ export function isValidRuPhone(phone: string) {
   const digits = toTelDigits(phone);
   return /^7(9\d{9})$/.test(digits);
 }
+
+/** Android Chrome often fills the visible input but not React state. */
+export function readInputValue(
+  stateValue: string,
+  input?: HTMLInputElement | HTMLTextAreaElement | null,
+) {
+  return (stateValue || input?.value || "").trim();
+}
+
+export function appendLeadContacts(formData: FormData, name: string, phone: string) {
+  const leadName = name.trim();
+  const leadPhone = toTelDigits(phone);
+  // Avoid the multipart field name `name` — some Android WebViews drop it.
+  formData.append("leadName", leadName);
+  formData.append("leadPhone", leadPhone);
+  formData.append("name", leadName);
+  formData.append("phone", leadPhone);
+}

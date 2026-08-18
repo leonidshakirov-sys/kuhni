@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type Ref } from "react";
 import Link from "next/link";
 import type { FormMode } from "@/types";
 import { legalLinks, siteConfig } from "@/config/site";
 import { furnitureOptionByProductId, furnitureTypeByProductId, products } from "@/data/products";
-import { trackEvent } from "@/lib/analytics";
+import { trackEvent, trackLeadSuccess } from "@/lib/analytics";
 import { getStoredUtm } from "@/lib/utm";
-import { formatPhoneInput, isValidRuPhone } from "@/lib/utils";
+import { appendLeadContacts, formatPhoneInput, isValidRuPhone, readInputValue } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { MessengerButtons } from "@/components/MessengerButtons";
 import { cn } from "@/lib/utils";
@@ -63,6 +63,10 @@ export function LeadForm({
   };
   const isPrices = mode === "prices";
   const started = useRef(false);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const sendingRef = useRef(false);
+  const leadSuccessSentRef = useRef(false);
   const furnitureFromProduct = furnitureOptionByProductId(productId);
 
   const [values, setValues] = useState<Record<string, string>>({
@@ -125,10 +129,12 @@ export function LeadForm({
 
   function validate() {
     const next: Record<string, string> = {};
-    if (!values.name.trim() || values.name.trim().length < 2) {
+    const name = readInputValue(values.name, nameRef.current);
+    const phone = readInputValue(values.phone, phoneRef.current);
+    if (!name) {
       next.name = "Укажите имя";
     }
-    if (!isValidRuPhone(values.phone)) {
+    if (!isValidRuPhone(phone)) {
       next.phone = "Укажите телефон в формате +7 9XX XXX-XX-XX";
     }
     if (!consent) next.consent = "Нужно согласие на обработку персональных данных";
@@ -139,16 +145,18 @@ export function LeadForm({
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
-    if (status === "loading") return;
+    if (sendingRef.current || status === "loading") return;
     if (!validate()) return;
 
+    sendingRef.current = true;
     setStatus("loading");
     setMessage("");
 
+    const name = readInputValue(values.name, nameRef.current);
+    const phone = readInputValue(values.phone, phoneRef.current);
     const formData = new FormData();
     formData.append("formType", mode);
-    formData.append("name", values.name.trim());
-    formData.append("phone", values.phone.trim());
+    appendLeadContacts(formData, name, phone);
     formData.append("comment", values.comment.trim());
     formData.append("consent", "true");
     formData.append("page", typeof window !== "undefined" ? window.location.href : "");
@@ -172,15 +180,24 @@ export function LeadForm({
       if (!response.ok || !data.ok) {
         throw new Error(data.error || "Не удалось отправить заявку");
       }
+      if (!leadSuccessSentRef.current) {
+        leadSuccessSentRef.current = true;
+        trackLeadSuccess();
+      }
       setStatus("success");
       const furniture = furnitureTypeByProductId(productId) || values.furnitureType || "any";
       trackEvent("lead_submit", { form: mode, furniture });
       if (isPrices) {
         trackEvent("price_form_submit", { furniture, product: productId || "none" });
       }
-    } catch {
+    } catch (error) {
+      sendingRef.current = false;
       setStatus("error");
-      setMessage("Не получилось отправить заявку. Напишите в WhatsApp или Telegram.");
+      setMessage(
+        error instanceof Error && error.message
+          ? `${error.message}. Напишите в WhatsApp или Telegram.`
+          : "Не получилось отправить заявку. Напишите в WhatsApp или Telegram.",
+      );
     }
   }
 
@@ -220,21 +237,23 @@ export function LeadForm({
     <>
       <Field
         label="Имя"
-        name="name"
+        name="leadName"
         value={values.name}
         error={errors.name}
         onChange={(v) => setField("name", v)}
         autoComplete="name"
+        inputRef={nameRef}
       />
       <Field
         label="Телефон"
-        name="phone"
+        name="leadPhone"
         type="tel"
         value={values.phone}
         error={errors.phone}
         onChange={(v) => setField("phone", formatPhoneInput(v))}
         autoComplete="tel"
         placeholder="+7 9XX XXX-XX-XX"
+        inputRef={phoneRef}
       />
     </>
   );
@@ -599,6 +618,7 @@ function Field({
   placeholder,
   className,
   autoComplete,
+  inputRef,
 }: {
   label: string;
   name: string;
@@ -609,6 +629,7 @@ function Field({
   placeholder?: string;
   className?: string;
   autoComplete?: string;
+  inputRef?: Ref<HTMLInputElement>;
 }) {
   const id = `field-${name}`;
   return (
@@ -623,6 +644,7 @@ function Field({
         value={value}
         placeholder={placeholder}
         autoComplete={autoComplete}
+        ref={inputRef}
         onChange={(e) => onChange(e.target.value)}
         aria-invalid={Boolean(error)}
         className={cn(

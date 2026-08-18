@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { quizSteps } from "@/data/quiz";
 import { legalLinks, siteConfig } from "@/config/site";
-import { trackEvent } from "@/lib/analytics";
+import { trackEvent, trackLeadSuccess } from "@/lib/analytics";
 import { getStoredUtm } from "@/lib/utm";
-import { formatPhoneInput, isValidRuPhone } from "@/lib/utils";
+import { appendLeadContacts, formatPhoneInput, isValidRuPhone, readInputValue } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { MessengerButtons } from "@/components/MessengerButtons";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,11 @@ export function Quiz() {
   const [files, setFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+  const nameRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const sendingRef = useRef(false);
+  const leadSuccessSentRef = useRef(false);
 
   function next() {
     const error = validateStep();
@@ -49,21 +54,24 @@ export function Quiz() {
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
-    if (status === "loading") return;
+    if (sendingRef.current || status === "loading") return;
+    const submittedName = readInputValue(name, nameRef.current);
+    const submittedPhone = readInputValue(phone, phoneRef.current);
     const nextErrors: Record<string, string> = {};
-    if (!name.trim()) nextErrors.name = "Укажите имя";
-    if (!isValidRuPhone(phone)) nextErrors.phone = "Укажите телефон";
+    if (!submittedName) nextErrors.name = "Укажите имя";
+    if (!isValidRuPhone(submittedPhone)) nextErrors.phone = "Укажите телефон";
     if (!consent) nextErrors.consent = "Нужно согласие на обработку персональных данных";
     if (Object.keys(nextErrors).length) {
       setErrors(nextErrors);
       return;
     }
 
+    sendingRef.current = true;
     setStatus("loading");
+    setErrorMessage("");
     const formData = new FormData();
     formData.append("formType", "quiz");
-    formData.append("name", name.trim());
-    formData.append("phone", phone.trim());
+    appendLeadContacts(formData, submittedName, submittedPhone);
     formData.append("consent", "true");
     formData.append("page", window.location.href);
     formData.append("submittedAt", new Date().toISOString());
@@ -83,13 +91,23 @@ export function Quiz() {
 
     try {
       const response = await fetch("/api/lead", { method: "POST", body: formData });
-      const data = (await response.json()) as { ok?: boolean };
-      if (!response.ok || !data.ok) throw new Error("fail");
+      const data = (await response.json()) as { ok?: boolean; error?: string };
+      if (!response.ok || !data.ok) throw new Error(data.error || "fail");
+      if (!leadSuccessSentRef.current) {
+        leadSuccessSentRef.current = true;
+        trackLeadSuccess();
+      }
       setStatus("success");
       trackEvent("lead_submit", { form: "quiz" });
       trackEvent("calculator_complete", { furniture });
-    } catch {
+    } catch (error) {
+      sendingRef.current = false;
       setStatus("error");
+      setErrorMessage(
+        error instanceof Error && error.message && error.message !== "fail"
+          ? error.message
+          : "Не получилось отправить. Напишите в WhatsApp или Telegram.",
+      );
     }
   }
 
@@ -180,6 +198,9 @@ export function Quiz() {
                 </label>
                 <input
                   id="quiz-name"
+                  name="leadName"
+                  autoComplete="name"
+                  ref={nameRef}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="h-12 w-full rounded-2xl border border-border bg-background px-4 text-sm outline-none ring-accent focus:ring-2"
@@ -192,7 +213,10 @@ export function Quiz() {
                 </label>
                 <input
                   id="quiz-phone"
+                  name="leadPhone"
                   type="tel"
+                  autoComplete="tel"
+                  ref={phoneRef}
                   value={phone}
                   onChange={(e) => setPhone(formatPhoneInput(e.target.value))}
                   className="h-12 w-full rounded-2xl border border-border bg-background px-4 text-sm outline-none ring-accent focus:ring-2"
@@ -235,7 +259,9 @@ export function Quiz() {
             </label>
             {errors.consent ? <FieldError text={errors.consent} /> : null}
             {status === "error" ? (
-              <FieldError text="Не получилось отправить. Напишите в WhatsApp или Telegram." />
+              <FieldError
+                text={errorMessage || "Не получилось отправить. Напишите в WhatsApp или Telegram."}
+              />
             ) : null}
           </Step>
           <div className="mt-6 flex gap-3">
