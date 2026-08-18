@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import { quizSteps } from "@/data/quiz";
 import { legalLinks, siteConfig } from "@/config/site";
-import { trackEvent } from "@/lib/analytics";
+import { trackEvent, trackLeadSuccess } from "@/lib/analytics";
 import { getStoredUtm } from "@/lib/utm";
 import { appendLeadContacts, formatPhoneInput, isValidRuPhone, readInputValue } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
@@ -30,6 +30,8 @@ export function Quiz() {
   const [errorMessage, setErrorMessage] = useState("");
   const nameRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
+  const sendingRef = useRef(false);
+  const leadSuccessSentRef = useRef(false);
 
   function next() {
     const error = validateStep();
@@ -52,7 +54,7 @@ export function Quiz() {
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
-    if (status === "loading") return;
+    if (sendingRef.current || status === "loading") return;
     const submittedName = readInputValue(name, nameRef.current);
     const submittedPhone = readInputValue(phone, phoneRef.current);
     const nextErrors: Record<string, string> = {};
@@ -64,6 +66,7 @@ export function Quiz() {
       return;
     }
 
+    sendingRef.current = true;
     setStatus("loading");
     setErrorMessage("");
     const formData = new FormData();
@@ -90,10 +93,15 @@ export function Quiz() {
       const response = await fetch("/api/lead", { method: "POST", body: formData });
       const data = (await response.json()) as { ok?: boolean; error?: string };
       if (!response.ok || !data.ok) throw new Error(data.error || "fail");
+      if (!leadSuccessSentRef.current) {
+        leadSuccessSentRef.current = true;
+        trackLeadSuccess();
+      }
       setStatus("success");
       trackEvent("lead_submit", { form: "quiz" });
       trackEvent("calculator_complete", { furniture });
     } catch (error) {
+      sendingRef.current = false;
       setStatus("error");
       setErrorMessage(
         error instanceof Error && error.message && error.message !== "fail"

@@ -39,3 +39,14 @@ export function trackEvent(
   if (!id || typeof window.ym !== "function") return;
   window.ym(id, "reachGoal", name, params);
 }
+
+/**
+ * Yandex.Metrika goal for a confirmed lead.
+ * Call only after the backend/API accepted the form (ok: true).
+ * Do not call on open, typing, submit click, validation, or send error.
+ */
+export function trackLeadSuccess() {
+  if (typeof window === "undefined") return;
+  if (typeof window.ym !== "function") return;
+  window.ym(111656931, "reachGoal", "lead_success");
+}

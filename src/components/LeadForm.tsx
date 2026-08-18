@@ -5,7 +5,7 @@ import Link from "next/link";
 import type { FormMode } from "@/types";
 import { legalLinks, siteConfig } from "@/config/site";
 import { furnitureOptionByProductId, furnitureTypeByProductId, products } from "@/data/products";
-import { trackEvent } from "@/lib/analytics";
+import { trackEvent, trackLeadSuccess } from "@/lib/analytics";
 import { getStoredUtm } from "@/lib/utm";
 import { appendLeadContacts, formatPhoneInput, isValidRuPhone, readInputValue } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
@@ -65,6 +65,8 @@ export function LeadForm({
   const started = useRef(false);
   const nameRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
+  const sendingRef = useRef(false);
+  const leadSuccessSentRef = useRef(false);
   const furnitureFromProduct = furnitureOptionByProductId(productId);
 
   const [values, setValues] = useState<Record<string, string>>({
@@ -143,9 +145,10 @@ export function LeadForm({
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
-    if (status === "loading") return;
+    if (sendingRef.current || status === "loading") return;
     if (!validate()) return;
 
+    sendingRef.current = true;
     setStatus("loading");
     setMessage("");
 
@@ -177,6 +180,10 @@ export function LeadForm({
       if (!response.ok || !data.ok) {
         throw new Error(data.error || "Не удалось отправить заявку");
       }
+      if (!leadSuccessSentRef.current) {
+        leadSuccessSentRef.current = true;
+        trackLeadSuccess();
+      }
       setStatus("success");
       const furniture = furnitureTypeByProductId(productId) || values.furnitureType || "any";
       trackEvent("lead_submit", { form: mode, furniture });
@@ -184,6 +191,7 @@ export function LeadForm({
         trackEvent("price_form_submit", { furniture, product: productId || "none" });
       }
     } catch (error) {
+      sendingRef.current = false;
       setStatus("error");
       setMessage(
         error instanceof Error && error.message
